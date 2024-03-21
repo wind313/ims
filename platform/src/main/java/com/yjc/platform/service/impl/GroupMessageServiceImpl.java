@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, GroupMessage> implements GroupMessageService {
-
+//1
     @Autowired
     private GroupService groupService;
 
