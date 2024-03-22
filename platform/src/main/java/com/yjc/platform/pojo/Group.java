@@ -2,10 +2,12 @@ package com.yjc.platform.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import java.util.Date;
 
 @Data
+@TableName("group_")
 public class Group {
 
     @TableId(value = "id",type = IdType.AUTO)

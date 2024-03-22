@@ -18,7 +18,7 @@ public class GroupController {
     private GroupService groupService;
 
     @PostMapping("/create")
-    public Result<GroupVO> create(@RequestParam String name){
+    public Result<GroupVO> create(@RequestParam("name") String name){
         return ResultUtil.success(groupService.create(name));
     }
 }

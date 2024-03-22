@@ -32,8 +32,7 @@ public class FriendController {
         for(Friend friend:list){
             FriendVO friendVO = new FriendVO();
             friendVO.setFriendId(friend.getFriendId());
-            friendVO.setFriendNickname(friend.getFriendNickname());
-            friendVO.setFriendHeadImage(friend.getFriendHeadImage());
+            friendVO.setRemark(friend.getRemark());
             l.add(friendVO);
         }
         return ResultUtil.success(l);

@@ -6,4 +6,6 @@ import com.yjc.platform.vo.GroupMessageVO;
 
 public interface GroupMessageService extends IService<GroupMessage> {
     Long send(GroupMessageVO groupMessageVO);
+
+    void recall(Long id);
 }

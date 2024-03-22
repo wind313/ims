@@ -36,9 +36,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 //    private PasswordEncoder encoder;
 
     @Autowired
-    private FriendService friendService;
-
-    @Autowired
     private GroupMemberService groupMemberService;
 
     @Override
@@ -108,7 +105,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
     public User findByUsername(String username){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername,username);
-        return getOne(queryWrapper);
+        User one = getOne(queryWrapper);
+        if(one == null) {
+            throw new GlobalException("该用户不存在");
+        }
+        return one;
     }
 
     @Override
@@ -121,15 +122,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
             throw new GlobalException("用户不存在");
         }
         if(!user.getNickname().equals(userVO.getNickname()) || user.getHeadImageThumb().equals(userVO.getHeadImageThumb())){
-            QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
-            queryWrapper.lambda().eq(Friend::getFriendId,userVO.getId());
-            List<Friend> flist = friendService.list(queryWrapper);
-            for(Friend friend:flist){
-                friend.setFriendNickname(userVO.getNickname());
-                friend.setFriendHeadImage(userVO.getHeadImageThumb());
-            }
-            friendService.updateBatchById(flist);
-
             List<GroupMember> glist = groupMemberService.findByUserId(userVO.getId());
             for(GroupMember groupMember:glist){
                 groupMember.setHeadImage(userVO.getHeadImageThumb());
@@ -152,7 +144,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
     public User findById(Long id){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getId,id);
-        return getOne(queryWrapper);
+        User one = getOne(queryWrapper);
+        if(one == null){
+            throw new GlobalException("该用户不存在");
+        }
+        return one;
     }
 
 }

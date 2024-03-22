@@ -16,7 +16,7 @@ public interface UserService extends IService<User> {
 
     LoginVO refreshToken(String refreshToken);
     User findById(Long id);
-    public User findByUsername(String username);
+    User findByUsername(String username);
 
     void update(UserVO userVO);
 }

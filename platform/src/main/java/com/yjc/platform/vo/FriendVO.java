@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class FriendVO {
     private Long friendId;
-    private String friendNickname;
-    private String friendHeadImage;
+    private String remark;
 }

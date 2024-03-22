@@ -2,6 +2,7 @@ package com.yjc.platform.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import java.util.Date;
 
@@ -11,7 +12,6 @@ public class Friend {
     private Long id;
     private Long userId;
     private Long friendId;
-    private String friendNickname;
-    private String friendHeadImage;
+    private String remark;
     private Date createTime;
 }

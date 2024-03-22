@@ -21,7 +21,7 @@ public class PrivateMessageController {
     }
 
     @DeleteMapping("/recall/{id}")
-    public Result recall(@PathVariable Long id){
+    public Result recall(@PathVariable("id") Long id){
         privateMessageService.recall(id);
         return ResultUtil.success();
     }
