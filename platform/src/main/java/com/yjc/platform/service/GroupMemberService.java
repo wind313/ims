@@ -14,4 +14,6 @@ public interface GroupMemberService extends IService<GroupMember> {
     List<GroupMember> findByGroupId(Long id);
 
     GroupMember findByGroupIdAndUserId(Long groupId, Long userId);
+
+    void deleteByGroupId(Long id);
 }
