@@ -27,7 +27,7 @@ public class LoginController {
     }
 
     @PutMapping("/refreshToken")
-    public Result<LoginVO> refreshToken(@RequestHeader String refreshToken){
+    public Result<LoginVO> refreshToken(@RequestHeader("refreshToken") String refreshToken){
         LoginVO loginVo =userService.refreshToken(refreshToken);
         return ResultUtil.success(loginVo);
     }

@@ -12,4 +12,6 @@ public interface GroupMemberService extends IService<GroupMember> {
     List<Long> findMemberIdsByGroupId(Long id);
 
     List<GroupMember> findByGroupId(Long id);
+
+    GroupMember findByGroupIdAndUserId(Long groupId, Long userId);
 }

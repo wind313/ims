@@ -7,5 +7,5 @@ spring:
 minio:
   endpoint: http://139.9.136.188:9001
   bucketName: yjc-im
-  accessKey: yjc
-  secretKey: yjc
+  accessKey: root
+  secretKey: Software.

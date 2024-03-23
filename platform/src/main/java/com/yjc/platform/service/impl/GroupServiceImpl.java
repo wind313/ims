@@ -1,6 +1,7 @@
 package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yjc.platform.Exceptions.GlobalException;
 import com.yjc.platform.mapper.GroupMapper;
 import com.yjc.platform.pojo.Group;
 import com.yjc.platform.pojo.GroupMember;
@@ -49,5 +50,22 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         groupVO.setNicknameInGroup(user.getNickname());
 
         return groupVO;
+    }
+
+    @Override
+    public void update(GroupVO groupVO) {
+        Long userId = SessionContext.getSession().getId();
+        Group group = getById(groupVO.getId());
+        if(userId == group.getOwnerId()){
+            Group group1 = BeanUtil.copyProperties(groupVO, Group.class);
+            updateById(group1);
+        }
+        GroupMember member = groupMemberService.findByGroupIdAndUserId(group.getId(), userId);
+        if(member == null) {
+            throw new GlobalException("您不是群成员");
+        }
+        member.setNicknameInGroup(groupVO.getNicknameInGroup());
+        member.setRemark(groupVO.getRemark());
+        groupMemberService.updateById(member);
     }
 }

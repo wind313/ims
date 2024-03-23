@@ -3,6 +3,7 @@ package com.yjc.platform.controller;
 import com.yjc.platform.pojo.Result;
 import com.yjc.platform.service.FileService;
 import com.yjc.platform.util.ResultUtil;
+import com.yjc.platform.vo.ImageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,5 +18,9 @@ public class FileController {
     @PostMapping("/file")
     public Result<String> file(@RequestParam("file") MultipartFile file){
         return ResultUtil.success(fileService.uploadFile(file));
+    }
+    @PostMapping("/image")
+    public Result<ImageVO> image(@RequestParam("file") MultipartFile file){
+        return ResultUtil.success(fileService.uploadImage(file));
     }
 }

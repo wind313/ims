@@ -31,7 +31,7 @@ public class MinioUtil {
             PutObjectArgs build = PutObjectArgs.builder()
                     .bucket(prop.getBucketName()).object(path+"/"+objectName)
                     .stream(file.getInputStream(), file.getSize(), -1)
-                    .contentType(file.getContentType()).build();log.error("上传失败");
+                    .contentType(file.getContentType()).build();
             minioClient.putObject(build);
         } catch (Exception e) {
             e.printStackTrace();

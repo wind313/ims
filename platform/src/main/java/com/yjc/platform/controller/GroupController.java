@@ -5,10 +5,7 @@ import com.yjc.platform.service.GroupService;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.GroupVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/group")
@@ -20,5 +17,11 @@ public class GroupController {
     @PostMapping("/create")
     public Result<GroupVO> create(@RequestParam("name") String name){
         return ResultUtil.success(groupService.create(name));
+    }
+
+    @PutMapping("/update")
+    public Result update(@RequestBody GroupVO groupVO){
+        groupService.update(groupVO);
+        return ResultUtil.success();
     }
 }

@@ -36,4 +36,12 @@ public class GroupMemberServiceImpl extends ServiceImpl<GroupMemberMapper, Group
         queryWrapper.lambda().eq(GroupMember::getGroupId,id);
         return this.list(queryWrapper);
     }
+
+    @Override
+    public GroupMember findByGroupIdAndUserId(Long groupId,Long userId){
+        QueryWrapper<GroupMember> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(GroupMember::getGroupId,groupId)
+                .eq(GroupMember::getMemberId,userId);
+        return getOne(queryWrapper);
+    }
 }
