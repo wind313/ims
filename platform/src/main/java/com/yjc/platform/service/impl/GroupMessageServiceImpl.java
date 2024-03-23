@@ -11,7 +11,7 @@ import com.yjc.platform.service.GroupMemberService;
 import com.yjc.platform.service.GroupMessageService;
 import com.yjc.platform.service.GroupService;
 import com.yjc.platform.session.SessionContext;
-import com.yjc.platform.util.BeanUtils;
+import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.GroupMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
         if(!list.contains(userId)){
             throw new GlobalException("你不在群聊中");
         }
-        GroupMessage groupMessage = BeanUtils.copyProperties(groupMessageVO, GroupMessage.class);
+        GroupMessage groupMessage = BeanUtil.copyProperties(groupMessageVO, GroupMessage.class);
         groupMessage.setSendId(userId);
         save(groupMessage);
 

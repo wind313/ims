@@ -9,7 +9,7 @@ import com.yjc.platform.pojo.PrivateMessage;
 import com.yjc.platform.service.FriendService;
 import com.yjc.platform.service.PrivateMessageService;
 import com.yjc.platform.session.SessionContext;
-import com.yjc.platform.util.BeanUtils;
+import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.PrivateMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         if(!friendService.isFriend(userId,privateMessageVO.getReceiveId())){
             throw new GlobalException("对方不是你的好友");
         }
-        PrivateMessage privateMessage = BeanUtils.copyProperties(privateMessageVO, PrivateMessage.class);
+        PrivateMessage privateMessage = BeanUtil.copyProperties(privateMessageVO, PrivateMessage.class);
         privateMessage.setSendId(userId);
         privateMessage.setStatus(MessageStatus.UNREAD.code());
         save(privateMessage);

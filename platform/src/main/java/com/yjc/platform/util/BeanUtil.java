@@ -2,7 +2,7 @@ package com.yjc.platform.util;
 
 import org.springframework.util.ReflectionUtils;
 
-public class BeanUtils {
+public class BeanUtil {
     public static <T> T copyProperties(Object obj,Class<T> clazz) {
         try{
             Object t = clazz.newInstance();

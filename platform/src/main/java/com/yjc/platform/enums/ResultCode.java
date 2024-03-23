@@ -9,7 +9,7 @@ public enum ResultCode {
     INVALID_TOKEN(401,"token已失效"),
     PROGRAM_ERROR(500,"系统繁忙，请稍后再试");
 
-    private int code;
+    private Integer code;
 
     private String message;
 

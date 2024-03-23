@@ -9,15 +9,13 @@ import com.yjc.platform.Exceptions.GlobalException;
 import com.yjc.platform.dto.LoginDto;
 import com.yjc.platform.enums.ResultCode;
 import com.yjc.platform.mapper.UserMapper;
-import com.yjc.platform.pojo.Friend;
 import com.yjc.platform.pojo.GroupMember;
 import com.yjc.platform.pojo.User;
-import com.yjc.platform.service.FriendService;
 import com.yjc.platform.service.GroupMemberService;
 import com.yjc.platform.service.UserService;
 import com.yjc.platform.session.Session;
 import com.yjc.platform.session.SessionContext;
-import com.yjc.platform.util.BeanUtils;
+import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.util.JWTUtil;
 import com.yjc.platform.vo.LoginVO;
 import com.yjc.platform.vo.UserVO;
@@ -52,7 +50,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
             throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "密码错误");
         }
-        Session session = BeanUtils.copyProperties(user,Session.class);
+        Session session = BeanUtil.copyProperties(user,Session.class);
 
         String json = JSON.toJSONString(session);
         String accessToken = JWTUtil.sign(user.getId(),json, JWTConstant.ACCESS_TOKEN_EXPIRE,JWTConstant.ACCESS_TOKEN_SECRET);
@@ -73,7 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
             throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "用户名已注册");
         }
 
-        user = BeanUtils.copyProperties(userDto,User.class);
+        user = BeanUtil.copyProperties(userDto,User.class);
         user.setNickname(userDto.getUsername());
 //        user.setPassword(encoder.encode(userDto.getPassword()));
         save(user);

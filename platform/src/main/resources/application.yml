@@ -4,3 +4,8 @@ spring:
     username: root
     password: ROOT
     url: jdbc:mysql://139.9.136.188:3306/yjc-im?useUnicode&characterEncode=utf-8
+minio:
+  endpoint: http://139.9.136.188:9001
+  bucketName: yjc-im
+  accessKey: root
+  secretKey: Software.

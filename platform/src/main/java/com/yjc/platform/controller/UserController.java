@@ -5,7 +5,7 @@ import com.yjc.platform.pojo.User;
 import com.yjc.platform.service.UserService;
 import com.yjc.platform.session.Session;
 import com.yjc.platform.session.SessionContext;
-import com.yjc.platform.util.BeanUtils;
+import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +23,19 @@ public class UserController {
     public Result<UserVO> getSelf(){
         Session session = SessionContext.getSession();
         User user = userService.findById(session.getId());
-        UserVO userVO = BeanUtils.copyProperties(user, UserVO.class);
+        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
         return ResultUtil.success(userVO);
     }
     @GetMapping("/find/{id}")
     public Result<UserVO> findById(@PathVariable("id") Long id){
         User user = userService.findById(id);
-        UserVO userVO = BeanUtils.copyProperties(user, UserVO.class);
+        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
         return ResultUtil.success(userVO);
     }
     @GetMapping("/find")
     public Result<UserVO> findByUsername(@RequestParam("username") String username){
         User user = userService.findByUsername(username);
-        UserVO userVO = BeanUtils.copyProperties(user, UserVO.class);
+        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
         return ResultUtil.success(userVO);
     }
     @PutMapping("/update")

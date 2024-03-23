@@ -9,7 +9,7 @@ import com.yjc.platform.service.GroupMemberService;
 import com.yjc.platform.service.GroupService;
 import com.yjc.platform.service.UserService;
 import com.yjc.platform.session.SessionContext;
-import com.yjc.platform.util.BeanUtils;
+import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.GroupVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         groupMember.setHeadImage(user.getHeadImageThumb());
         groupMemberService.save(groupMember);
 
-        GroupVO groupVO = BeanUtils.copyProperties(group,GroupVO.class);
+        GroupVO groupVO = BeanUtil.copyProperties(group,GroupVO.class);
         groupVO.setRemark(name);
         groupVO.setNicknameInGroup(user.getNickname());
 
