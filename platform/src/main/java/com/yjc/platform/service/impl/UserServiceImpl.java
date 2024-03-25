@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -66,7 +67,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
     @Override
     public void register(LoginDto userDto) {
-        User user = findByUsername(userDto.getUsername());
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getUsername,userDto.getUsername());
+        User user = getOne(queryWrapper);
         if(user != null){
             throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "用户名已注册");
         }
@@ -110,6 +113,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         return one;
     }
 
+    @Transactional
     @Override
     public void update(UserVO userVO) {
         if(!SessionContext.getSession().getId().equals(userVO.getId())){

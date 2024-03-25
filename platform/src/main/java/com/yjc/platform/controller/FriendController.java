@@ -6,11 +6,13 @@ import com.yjc.platform.service.FriendService;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.FriendVO;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/friend")
@@ -20,27 +22,21 @@ public class FriendController {
     private FriendService friendService;
 
     @PutMapping("/add")
-    public Result add(@RequestParam("friendId") Long friendId){
+    public Result add(@NotNull(message = "好友id不能为空") @RequestParam("friendId") Long friendId){
         friendService.add(friendId);
         return ResultUtil.success();
     }
 
     @GetMapping("/list")
     public Result<List<FriendVO>> list(){
-        List<Friend> list = friendService.friends(SessionContext.getSession().getId());
-        List<FriendVO> l = new ArrayList<>();
-        for(Friend friend:list){
-            FriendVO friendVO = new FriendVO();
-            friendVO.setFriendId(friend.getFriendId());
-            friendVO.setRemark(friend.getRemark());
-            l.add(friendVO);
-        }
-        return ResultUtil.success(l);
+
+        return ResultUtil.success(friendService.friends());
     }
 
     @DeleteMapping("/delete/{friendId}")
-    public Result delete(@PathVariable("friendId") Long friendId){
+    public Result delete(@NotNull(message = "好友id不能为空") @PathVariable("friendId") Long friendId){
         friendService.delete(friendId);
         return ResultUtil.success();
     }
+
 }

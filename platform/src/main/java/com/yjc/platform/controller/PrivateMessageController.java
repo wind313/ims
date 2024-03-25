@@ -4,6 +4,8 @@ import com.yjc.platform.pojo.Result;
 import com.yjc.platform.service.PrivateMessageService;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.PrivateMessageVO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +17,13 @@ public class PrivateMessageController {
     private PrivateMessageService privateMessageService;
 
     @PostMapping("/send")
-    public Result<Long> send(@RequestBody PrivateMessageVO privateMessageVO){
+    public Result<Long> send(@Valid @RequestBody PrivateMessageVO privateMessageVO){
 
         return ResultUtil.success(privateMessageService.send(privateMessageVO));
     }
 
     @DeleteMapping("/recall/{id}")
-    public Result recall(@PathVariable("id") Long id){
+    public Result recall(@NotNull(message = "消息id不能为空") @PathVariable("id") Long id){
         privateMessageService.recall(id);
         return ResultUtil.success();
     }

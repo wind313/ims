@@ -8,12 +8,17 @@ import com.yjc.platform.pojo.Friend;
 import com.yjc.platform.pojo.User;
 import com.yjc.platform.service.FriendService;
 import com.yjc.platform.service.UserService;
+import com.yjc.platform.session.Session;
 import com.yjc.platform.session.SessionContext;
+import com.yjc.platform.util.BeanUtil;
+import com.yjc.platform.vo.FriendVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implements FriendService {
@@ -46,8 +51,6 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
             Friend friend = new Friend();
             friend.setUserId(userId);
             friend.setFriendId(friendId);
-            User friendIn = userService.findById(friendId);
-            friend.setRemark(friendIn.getNickname());
             save(friend);
         }
         else{
@@ -57,12 +60,31 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
 
 
     @Override
-    public List<Friend> friends(Long id) {
-        QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Friend::getUserId,id);
-        return list(queryWrapper);
+    public List<FriendVO> friends() {
+        Long userId = SessionContext.getSession().getId();
+
+        List<Friend> list = findByUserId(userId);
+        if(list == null || list.size() == 0){
+            return Collections.EMPTY_LIST;
+        }
+        List<Long> ids = list.stream().map(friend -> friend.getFriendId()).collect(Collectors.toList());
+
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.lambda().in(User::getId,ids);
+        List<User> users = userService.list(wrapper);
+
+
+        List<FriendVO> l = list.stream().map(friend -> {
+            FriendVO friendVO = BeanUtil.copyProperties(friend, FriendVO.class);
+            User user1 = users.stream().filter(user -> user.getId() == friend.getFriendId()).findFirst().get();
+            friendVO.setNickname(user1.getNickname());
+            friendVO.setHeadImage(user1.getHeadImageThumb());
+            return friendVO;
+        }).collect(Collectors.toList());
+        return l;
     }
 
+    @Transactional
     @Override
     public void delete(Long friendId) {
         Long userId = SessionContext.getSession().getId();
@@ -81,4 +103,12 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         }
         removeById(one.getId());
     }
+
+    @Override
+    public List<Friend> findByUserId(Long id){
+        QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Friend::getUserId,id);
+        return list(queryWrapper);
+    }
+
 }

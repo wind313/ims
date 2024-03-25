@@ -15,7 +15,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/register","/login","refreshToken");
+                .excludePathPatterns("/register","/login","/refreshToken");
     }
 
 }
