@@ -9,6 +9,8 @@
 
 	<modules>
 		<module>platform</module>
+		<module>server</module>
+		<module>common</module>
 	</modules>
 
 	<properties>

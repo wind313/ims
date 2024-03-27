@@ -2,13 +2,12 @@ package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yjc.platform.Exceptions.GlobalException;
+import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.mapper.FriendMapper;
 import com.yjc.platform.pojo.Friend;
 import com.yjc.platform.pojo.User;
 import com.yjc.platform.service.FriendService;
 import com.yjc.platform.service.UserService;
-import com.yjc.platform.session.Session;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.FriendVO;
@@ -21,10 +20,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+//@CacheConfig(cacheNames = RedisKey.IM_FRIEND)
 public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implements FriendService {
 
     @Autowired
     private UserService userService;
+
 
     @Transactional
     @Override
@@ -37,15 +38,16 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         bind(friendId,userId);
     }
 
+//    @Cacheable(key = "#p0+':'+#p1")
     @Override
-    public boolean isFriend(Long id1, Long id2) {
+    public boolean isFriend(Long userId1, Long userId2) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .eq(Friend::getUserId,id1)
-                .eq(Friend::getFriendId,id2);
+                .eq(Friend::getUserId,userId1)
+                .eq(Friend::getFriendId,userId2);
         return count(queryWrapper)>0;
     }
-
+//    @CacheEvict(key = "#p0+':'+#p1")
     public void bind(Long userId, Long friendId) {
         if(!isFriend(userId,friendId)){
             Friend friend = new Friend();
@@ -91,7 +93,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         unbind(userId,friendId);
         unbind(friendId,userId);
     }
-
+//    @CacheEvict(key = "#p0+':'+#p1")
     public void unbind(Long userId,Long friendId){
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()

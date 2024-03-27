@@ -2,8 +2,8 @@ package com.yjc.platform.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.yjc.platform.Constants.JWTConstant;
-import com.yjc.platform.Exceptions.GlobalException;
+import com.yjc.platform.constants.JWTConstant;
+import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.enums.ResultCode;
 import com.yjc.platform.session.Session;
 import com.yjc.platform.util.JWTUtil;

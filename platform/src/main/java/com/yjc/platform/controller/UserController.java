@@ -1,6 +1,5 @@
 package com.yjc.platform.controller;
 
-import com.yjc.platform.Exceptions.GlobalException;
 import com.yjc.platform.pojo.Result;
 import com.yjc.platform.pojo.User;
 import com.yjc.platform.service.UserService;

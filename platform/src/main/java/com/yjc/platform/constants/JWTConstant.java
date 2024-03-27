@@ -1,4 +1,4 @@
-package com.yjc.platform.Constants;
+package com.yjc.platform.constants;
 
 public class JWTConstant {
     public static final Integer ACCESS_TOKEN_EXPIRE =60*60;

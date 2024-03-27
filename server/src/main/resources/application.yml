@@ -1,0 +1,7 @@
+server:
+  port: 8081
+websocket:
+  enable: true
+  port: 8082
+
+

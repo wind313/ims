@@ -7,14 +7,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="client" />
+        <module name="server" />
+        <module name="common" />
         <module name="platform" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="17" />
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="client" options="-parameters" />
-      <module name="ims" options="" />
+      <module name="common" options="" />
+      <module name="server" options="" />
     </option>
   </component>
 </project>

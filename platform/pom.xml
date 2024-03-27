@@ -43,17 +43,18 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.yjc</groupId>
+			<artifactId>common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<!--     redis     -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
-		<!--     fastjson     -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-		</dependency>
+
 
 		<!--     lombok     -->
 		<dependency>
@@ -68,7 +69,7 @@
 			<artifactId>mybatis-plus-spring-boot3-starter</artifactId>
 		</dependency>
 
-		<!--     spring-security     -->
+        <!--     spring-security     -->
 <!--		<dependency>-->
 <!--			<groupId>org.springframework.boot</groupId>-->
 <!--			<artifactId>spring-boot-starter-security</artifactId>-->
@@ -110,14 +111,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
+				<version>2.0.3.RELEASE</version>
 			</plugin>
 		</plugins>
 	</build>

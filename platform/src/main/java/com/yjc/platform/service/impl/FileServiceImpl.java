@@ -1,7 +1,7 @@
 package com.yjc.platform.service.impl;
 
-import com.yjc.platform.Constants.MinioConstant;
-import com.yjc.platform.Exceptions.GlobalException;
+import com.yjc.platform.constants.MinioConstant;
+import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.config.MinioConfig;
 import com.yjc.platform.enums.FileType;
 import com.yjc.platform.service.FileService;
@@ -32,7 +32,7 @@ public class FileServiceImpl implements FileService {
         if(StringUtils.isEmpty(upload)){
             throw new GlobalException("上传失败");
         }
-        ;
+
         return getUrl(FileType.FILE,upload);
     }
     @Override
@@ -44,7 +44,7 @@ public class FileServiceImpl implements FileService {
         if(StringUtils.isEmpty(upload)){
             throw new GlobalException("上传失败");
         }
-        ;
+
         String url = getUrl(FileType.IMAGE, upload);
         ImageVO imageVO = new ImageVO();
         imageVO.setThumbUrl(url);

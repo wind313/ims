@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//@CacheConfig(cacheNames = RedisKey.IM_MEMBER)
 @Service
 public class GroupMemberServiceImpl extends ServiceImpl<GroupMemberMapper, GroupMember> implements GroupMemberService {
     @Override
@@ -22,6 +23,7 @@ public class GroupMemberServiceImpl extends ServiceImpl<GroupMemberMapper, Group
         return this.list(queryWrapper);
     }
 
+//    @Cacheable(key = "#p0")
     @Override
     public List<Long> findMemberIdsByGroupId(Long id) {
         QueryWrapper<GroupMember> queryWrapper = new QueryWrapper<>();

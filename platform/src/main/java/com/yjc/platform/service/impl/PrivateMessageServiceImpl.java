@@ -1,8 +1,8 @@
 package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.yjc.platform.Constants.Constant;
-import com.yjc.platform.Exceptions.GlobalException;
+import com.yjc.platform.constants.Constant;
+import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.enums.MessageStatus;
 import com.yjc.platform.mapper.PrivateMessageMapper;
 import com.yjc.platform.pojo.PrivateMessage;
@@ -32,7 +32,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         save(privateMessage);
 
 
-        return null;
+        return privateMessage.getId();
     }
 
     @Override

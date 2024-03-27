@@ -1,4 +1,4 @@
-package com.yjc.platform.Exceptions;
+package com.yjc.platform.exceptions;
 
 import com.yjc.platform.enums.ResultCode;
 import lombok.Data;
