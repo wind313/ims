@@ -1,0 +1,12 @@
+server:
+  port: 8081
+websocket:
+  enable: true
+  port: 8082
+spring:
+  data:
+    redis:
+      host: 139.9.136.188
+      port: 6379
+      password: ROOT
+      database: 3
