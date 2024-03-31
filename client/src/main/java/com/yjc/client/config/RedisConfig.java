@@ -1,4 +1,4 @@
-package com.yjc.server.config;
+package com.yjc.client.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -13,11 +13,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-@Configuration
-public class RedisConfig{
-
-
-    @Bean
+@Configuration("IMRedisConfig")
+public class RedisConfig {
+    @Bean("IMRedisTemplate")
     public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory connectionFactory){
         //创建Template
         RedisTemplate<String,Object> template = new RedisTemplate<>();
@@ -45,7 +43,4 @@ public class RedisConfig{
         Jackson2JsonRedisSerializer jsonRedisSerializer = new Jackson2JsonRedisSerializer(om,Object.class);
         return jsonRedisSerializer;
     }
-
-
-
 }

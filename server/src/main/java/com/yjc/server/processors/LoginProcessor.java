@@ -1,5 +1,6 @@
 package com.yjc.server.processors;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.yjc.common.constant.Constant;
 import com.yjc.common.constant.RedisKey;
 import com.yjc.common.enums.CommandType;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -43,4 +45,12 @@ public class LoginProcessor extends FatherProcessor<LoginInfo> {
         sendInfo.setCmd(CommandType.LOGIN.getCode());
         ctx.channel().writeAndFlush(sendInfo);
     }
+
+    @Override
+    public LoginInfo transform(Object o){
+        HashMap map = (HashMap)o;
+        LoginInfo loginInfo = BeanUtil.fillBeanWithMap(map, new LoginInfo(), false);
+        return loginInfo;
+    }
+
 }

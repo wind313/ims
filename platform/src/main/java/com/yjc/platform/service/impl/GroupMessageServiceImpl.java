@@ -1,11 +1,15 @@
 package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yjc.client.Sender;
+import com.yjc.common.model.GroupMessageInfo;
 import com.yjc.platform.constants.Constant;
+import com.yjc.platform.enums.MessageType;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.enums.MessageStatus;
 import com.yjc.platform.mapper.GroupMessageMapper;
 import com.yjc.platform.pojo.Group;
+import com.yjc.platform.pojo.GroupMember;
 import com.yjc.platform.pojo.GroupMessage;
 import com.yjc.platform.service.GroupMemberService;
 import com.yjc.platform.service.GroupMessageService;
@@ -16,6 +20,7 @@ import com.yjc.platform.vo.GroupMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,10 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
 
     @Autowired
     private GroupMemberService groupMemberService;
+
+
+    @Autowired
+    private Sender  sender;
     @Override
     public Long send(GroupMessageVO groupMessageVO) {
         Long userId = SessionContext.getSession().getId();
@@ -47,7 +56,8 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
         save(groupMessage);
 
         list = list.stream().filter(id -> id != userId).collect(Collectors.toList());
-
+        GroupMessageInfo groupMessageInfo = BeanUtil.copyProperties(groupMessage, GroupMessageInfo.class);
+        sender.sendGroupMessage(list,groupMessageInfo);
 
         return groupMessage.getId();
     }
@@ -74,8 +84,15 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
         groupMessage.setStatus(MessageStatus.RECALL.code());
         updateById(groupMessage);
 
-        list.stream().filter(uid -> id!=userId).collect(Collectors.toList());
-
+        list = list.stream().filter(uid -> id != userId).collect(Collectors.toList());
+        GroupMessageInfo groupMessageInfo = BeanUtil.copyProperties(groupMessage, GroupMessageInfo.class);
+        GroupMember member = groupMemberService.findByGroupIdAndUserId(groupMessage.getReceiveId(), userId);
+        String content = member.getNicknameInGroup()+"撤回了一条消息";
+        if(member.getNicknameInGroup().equals("")) content = member.getMemberNickname()+"撤回了一条消息";
+        groupMessageInfo.setContent(content);
+        groupMessageInfo.setType(MessageType.TIP.getCode());
+        groupMessageInfo.setSendTime(new Date());
+        sender.sendGroupMessage(list,groupMessageInfo);
 
     }
 }

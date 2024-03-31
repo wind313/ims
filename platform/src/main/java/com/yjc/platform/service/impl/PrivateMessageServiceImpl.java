@@ -1,7 +1,10 @@
 package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yjc.client.Sender;
+import com.yjc.common.model.PrivateMessageInfo;
 import com.yjc.platform.constants.Constant;
+import com.yjc.platform.enums.MessageType;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.enums.MessageStatus;
 import com.yjc.platform.mapper.PrivateMessageMapper;
@@ -14,11 +17,16 @@ import com.yjc.platform.vo.PrivateMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper, PrivateMessage> implements PrivateMessageService {
 
     @Autowired
     private FriendService friendService;
+
+    @Autowired
+    private Sender sender;
 
     @Override
     public Long send(PrivateMessageVO privateMessageVO) {
@@ -31,6 +39,8 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         privateMessage.setStatus(MessageStatus.UNREAD.code());
         save(privateMessage);
 
+        PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
+        sender.sendPrivateMessage(privateMessageVO.getReceiveId(),privateMessageInfo);
 
         return privateMessage.getId();
     }
@@ -51,7 +61,11 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         message.setStatus(MessageStatus.RECALL.code());
         updateById(message);
 
-
+        PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(message,PrivateMessageInfo.class);
+        privateMessageInfo.setType(MessageType.TIP.getCode());
+        privateMessageInfo.setContent("对方撤回了一条消息");
+        privateMessageInfo.setSendTime(new Date());
+        sender.sendPrivateMessage(message.getReceiveId(),privateMessageInfo);
 
     }
 

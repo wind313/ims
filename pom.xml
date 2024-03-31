@@ -11,6 +11,7 @@
 		<module>platform</module>
 		<module>server</module>
 		<module>common</module>
+		<module>client</module>
 	</modules>
 
 	<properties>
