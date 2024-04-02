@@ -2,6 +2,7 @@ package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yjc.platform.constants.RedisKey;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.mapper.FriendMapper;
 import com.yjc.platform.pojo.Friend;
@@ -12,6 +13,9 @@ import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.FriendVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

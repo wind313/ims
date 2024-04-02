@@ -1,6 +1,5 @@
 package com.yjc.server.processors;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.yjc.common.constant.RedisKey;
 import com.yjc.common.enums.CommandType;
 import com.yjc.common.enums.SendCode;
@@ -11,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-
 @Component
-public class PrivateMessageProcessor extends FatherProcessor<ReceiveInfo<PrivateMessageInfo>>{
+public class PrivateMessageProcessor extends AbstractProcessor<ReceiveInfo<PrivateMessageInfo>> {
 
     @Autowired
     RedisTemplate<String,Object> redisTemplate;

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class GroupMessageProcessor extends FatherProcessor<ReceiveInfo<GroupMessageInfo>>{
+public class GroupMessageProcessor extends AbstractProcessor<ReceiveInfo<GroupMessageInfo>> {
 
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;

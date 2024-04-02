@@ -17,6 +17,11 @@ public class ServerGroup implements CommandLineRunner {
     @Autowired
     private IMServer server;
 
+    public boolean isReady(){
+        return server.isReady();
+    }
+
+
     @Override
     public void run(String... args) throws Exception {
         String key = RedisKey.MAX_SERVER_ID;

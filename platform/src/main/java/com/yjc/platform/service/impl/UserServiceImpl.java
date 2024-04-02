@@ -21,7 +21,7 @@ import com.yjc.platform.vo.LoginVO;
 import com.yjc.platform.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +31,8 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements UserService {
 
-//    @Autowired
-//    private PasswordEncoder encoder;
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Autowired
     private GroupMemberService groupMemberService;
@@ -44,13 +44,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
             throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "用户不存在");
         }
-//        if(!encoder.matches(userDto.getPassword(),user.getPassword())){
-//            throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "密码错误");
-//        }
-        if(!user.getPassword().equals(userDto.getPassword())){
-
+        if(!encoder.matches(userDto.getPassword(),user.getPassword())){
             throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "密码错误");
         }
+//        if(!user.getPassword().equals(userDto.getPassword())){
+//            throw new GlobalException(ResultCode.PROGRAM_ERROR.getCode(), "密码错误");
+//        }
         Session session = BeanUtil.copyProperties(user,Session.class);
 
         String json = JSON.toJSONString(session);
@@ -76,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
         user = BeanUtil.copyProperties(userDto,User.class);
         user.setNickname(userDto.getUsername());
-//        user.setPassword(encoder.encode(userDto.getPassword()));
+        user.setPassword(encoder.encode(userDto.getPassword()));
         save(user);
         log.info("注册成功");
     }

@@ -8,9 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 @ComponentScan("com.yjc.client")
 @Configuration
-@EnableAutoConfiguration
 public class ClientApplication {
-
-
 
 }

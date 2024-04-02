@@ -3,7 +3,7 @@ package com.yjc.server.websocket.handler;
 import com.yjc.common.constant.RedisKey;
 import com.yjc.common.enums.CommandType;
 import com.yjc.common.model.SendInfo;
-import com.yjc.server.processors.FatherProcessor;
+import com.yjc.server.processors.AbstractProcessor;
 import com.yjc.server.processors.ProcessorFactory;
 import com.yjc.server.utils.CtxMap;
 import com.yjc.server.utils.SpringContextHolder;
@@ -20,7 +20,7 @@ public class ChannelHandler extends SimpleChannelInboundHandler<SendInfo> {
 
     @Override
     public void channelRead0(ChannelHandlerContext channelHandlerContext, SendInfo sendInfo) throws Exception {
-        FatherProcessor processor = ProcessorFactory.createProcessor(CommandType.fromCode(sendInfo.getCmd()));
+        AbstractProcessor processor = ProcessorFactory.createProcessor(CommandType.fromCode(sendInfo.getCmd()));
         processor.process(channelHandlerContext,processor.transform(sendInfo.getData()));
     }
     @Override

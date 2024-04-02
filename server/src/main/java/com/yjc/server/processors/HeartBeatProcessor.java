@@ -5,7 +5,6 @@ import com.yjc.common.constant.Constant;
 import com.yjc.common.constant.RedisKey;
 import com.yjc.common.enums.CommandType;
 import com.yjc.common.model.HeartBeatInfo;
-import com.yjc.common.model.LoginInfo;
 import com.yjc.common.model.SendInfo;
 import com.yjc.server.websocket.server.IMServer;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,7 +17,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class HeartBeatProcessor extends FatherProcessor<HeartBeatInfo> {
+public class HeartBeatProcessor extends AbstractProcessor<HeartBeatInfo> {
 
     @Autowired
     IMServer server;

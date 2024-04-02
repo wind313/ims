@@ -8,13 +8,13 @@ import com.yjc.common.enums.SendCode;
 import com.yjc.common.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import java.util.LinkedList;
-import java.util.List;
-
-@Component
+@Configuration
 public class Sender{
 
     @Autowired
@@ -54,6 +54,48 @@ public class Sender{
     }
 
     public void sendGroupMessage(List<Long> receiveIds, GroupMessageInfo... groupMessageInfos){
+        List<Long> offLineIds = Collections.synchronizedList(new LinkedList<Long>());
+        Map<Integer,List<Long>> map = new ConcurrentHashMap<>();
+        receiveIds.parallelStream().forEach(id->{
+            String key = RedisKey.USER_SEVER_ID + id;
+            Integer serverId = (Integer) redisTemplate.opsForValue().get(key);
+            if(serverId != null){
+                synchronized (map){
+                    if(map.containsKey(serverId)){
+                        map.get(serverId).add(id);
+                    }
+                    else {
+                        List<Long> list = Collections.synchronizedList(new LinkedList<Long>());
+                        list.add(id);
+                        map.put(serverId,list);
+                    }
+                }
+            }
+            else {
+                offLineIds.add(id);
+            }
+        });
+        for(Map.Entry<Integer,List<Long>> entry:map.entrySet()){
+            ReceiveInfo[] receiveInfos = new ReceiveInfo[groupMessageInfos.length];
+            for(int i=0;i<groupMessageInfos.length;i++){
+                ReceiveInfo<GroupMessageInfo> receiveInfo = new ReceiveInfo<>();
+                receiveInfo.setCmd(CommandType.GROUP_MESSAGE.getCode());
+                receiveInfo.setReceiveIds(new LinkedList<>(entry.getValue()));
+                receiveInfo.setData(groupMessageInfos[i]);
+                receiveInfos[i] = receiveInfo;
+            }
+            String key = RedisKey.UNREAD_GROUP_QUEUE + entry.getKey();
+            redisTemplate.opsForList().rightPushAll(key,receiveInfos);
+        }
+        for(GroupMessageInfo groupMessageInfo:groupMessageInfos){
+            for(Long id:offLineIds){
+                ResultInfo<GroupMessageInfo> resultInfo = new ResultInfo<>();
+                resultInfo.setCode(SendCode.NOT_ONLINE);
+                resultInfo.setMessageInfo(groupMessageInfo);
+                resultInfo.setReceiveId(id);
+                messageListenerMulticaster.multicast(ListenerType.GROUP,resultInfo);
+            }
 
+        }
     }
 }

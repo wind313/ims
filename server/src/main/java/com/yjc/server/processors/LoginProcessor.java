@@ -13,7 +13,6 @@ import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class LoginProcessor extends FatherProcessor<LoginInfo> {
+public class LoginProcessor extends AbstractProcessor<LoginInfo> {
 
     @Autowired
     RedisTemplate<String,Object> template;

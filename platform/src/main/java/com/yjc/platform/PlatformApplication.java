@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @MapperScan(basePackages = {"com.yjc.platform.mapper"})
-@SpringBootApplication
-@ComponentScan("com.yjc.client")
+@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+//@ComponentScan("com.yjc.client")
 public class PlatformApplication {
 
 	public static void main(String[] args) {
