@@ -1,7 +1,9 @@
 package com.yjc.platform.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjc.client.Sender;
+import com.yjc.common.constant.RedisKey;
 import com.yjc.common.model.PrivateMessageInfo;
 import com.yjc.platform.constants.Constant;
 import com.yjc.platform.enums.MessageType;
@@ -15,9 +17,12 @@ import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.PrivateMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper, PrivateMessage> implements PrivateMessageService {
@@ -27,6 +32,9 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
 
     @Autowired
     private Sender sender;
+
+    @Autowired
+    RedisTemplate<String,Object> redisTemplate;
 
     @Override
     public Long send(PrivateMessageVO privateMessageVO) {
@@ -68,5 +76,30 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         sender.sendPrivateMessage(message.getReceiveId(),privateMessageInfo);
 
     }
+
+    @Override
+    public void pullUnreadMessage() {
+        Long userId = SessionContext.getSession().getId();
+        String key = RedisKey.USER_SEVER_ID + userId;
+        Integer severId = (Integer)redisTemplate.opsForValue().get(key);
+        if(severId == null){
+            throw new GlobalException("用户未建立连接");
+        }
+        QueryWrapper<PrivateMessage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(PrivateMessage::getReceiveId,userId)
+                .eq(PrivateMessage::getStatus,MessageStatus.UNREAD);
+        List<PrivateMessage> list = this.list(queryWrapper);
+        if(!list.isEmpty()){
+            List<PrivateMessageInfo> collect = list.stream().map(privateMessage -> {
+                PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
+                return privateMessageInfo;
+            }).collect(Collectors.toList());
+            PrivateMessageInfo[] arr = collect.toArray(new PrivateMessageInfo[list.size()]);
+            sender.sendPrivateMessage(userId,arr);
+        }
+
+    }
+
 
 }

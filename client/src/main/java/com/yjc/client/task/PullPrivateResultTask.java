@@ -15,7 +15,7 @@ public class PullPrivateResultTask extends AbstractPullResultTask{
 
     @Autowired
     @Qualifier("IMRedisTemplate")
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Autowired
     private MessageListenerMulticaster listenerMulticaster;
@@ -23,7 +23,8 @@ public class PullPrivateResultTask extends AbstractPullResultTask{
     @Override
     public void pullMessage() {
         String key = RedisKey.RESULT_PRIVATE_QUEUE;
-        ResultInfo result = (ResultInfo)redisTemplate.opsForList().leftPop(key, 10, TimeUnit.SECONDS);
+        ResultInfo result = (ResultInfo)redisTemplate.opsForList().leftPop(key,15,TimeUnit.SECONDS);
+
         if(result != null){
             listenerMulticaster.multicast(ListenerType.PRIVATE,result);
         }

@@ -8,18 +8,18 @@ import com.yjc.common.enums.SendCode;
 import com.yjc.common.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Configuration
+@Component
 public class Sender{
 
     @Autowired
     @Qualifier("IMRedisTemplate")
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Autowired
     private MessageListenerMulticaster messageListenerMulticaster;

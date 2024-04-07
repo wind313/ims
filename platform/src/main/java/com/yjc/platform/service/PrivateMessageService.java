@@ -8,4 +8,6 @@ public interface PrivateMessageService extends IService<PrivateMessage> {
     Long send(PrivateMessageVO privateMessageVO);
 
     void recall(Long id);
+
+    void pullUnreadMessage();
 }

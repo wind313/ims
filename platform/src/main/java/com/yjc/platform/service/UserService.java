@@ -7,6 +7,8 @@ import com.yjc.platform.pojo.User;
 import com.yjc.platform.vo.LoginVO;
 import com.yjc.platform.vo.UserVO;
 
+import java.util.List;
+
 public interface UserService extends IService<User> {
 
 
@@ -19,4 +21,6 @@ public interface UserService extends IService<User> {
     User findByUsername(String username);
 
     void update(UserVO userVO);
+
+    List<Long> checkOnline(String userIds);
 }

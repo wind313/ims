@@ -84,6 +84,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
             FriendVO friendVO = BeanUtil.copyProperties(friend, FriendVO.class);
             User user1 = users.stream().filter(user -> user.getId() == friend.getFriendId()).findFirst().get();
             friendVO.setNickname(user1.getNickname());
+            if(friend.getRemark()!="") friendVO.setNickname(friend.getRemark());
             friendVO.setHeadImage(user1.getHeadImageThumb());
             return friendVO;
         }).collect(Collectors.toList());

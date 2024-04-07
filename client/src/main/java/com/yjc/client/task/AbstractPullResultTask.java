@@ -4,6 +4,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,8 +25,9 @@ public abstract class AbstractPullResultTask {
                 public void run() {
                     try {
                         pullMessage();
-                    }catch (Exception e){
-                        log.error("任务调度异常",e);
+                    }
+                    catch (Exception e){
+                        log.error("任务调度异常");
                         Thread.sleep(200);
                     }
                     if(!executorService.isShutdown()){

@@ -6,16 +6,27 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ROOT
-    url: jdbc:mysql://139.9.136.188:3306/yjc-im?useUnicode&characterEncode=utf-8
+    url: jdbc:mysql://139.9.136.188:3306/yjc-im?useUnicode&characterEncode=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    hikari:
+      max-lifetime: 120000
   data:
     redis:
       host: 139.9.136.188
       port: 6379
       password: ROOT
       database: 3
+  main:
+    allow-circular-references: true
 
 minio:
   endpoint: http://139.9.136.188:9001
   bucketName: yjc-im
   accessKey: root
   secretKey: Software.
+springdoc:
+  api-docs:
+    path: /swagger
+  swagger-ui:
+    path: /swaggerUI
+    disable-swagger-default-url: true
+    enabled: true

@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 
 @Configuration("IMRedisConfig")
 public class RedisConfig {
-    @Bean("IMRedisTemplate")
+    @Bean(name = "IMRedisTemplate")
     public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory connectionFactory){
         //创建Template
         RedisTemplate<String,Object> template = new RedisTemplate<>();
@@ -26,14 +26,14 @@ public class RedisConfig {
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
         //value和hashValue采用JSON序列化
-        template.setValueSerializer(jsonRedisSerializer());
-        template.setHashValueSerializer(jsonRedisSerializer());
+        template.setValueSerializer(jackson2JsonRedisSerializer());
+        template.setHashValueSerializer(jackson2JsonRedisSerializer());
         template.afterPropertiesSet();
         return template;
     }
 
     @Bean
-    public Jackson2JsonRedisSerializer jsonRedisSerializer(){
+    public Jackson2JsonRedisSerializer jackson2JsonRedisSerializer(){
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

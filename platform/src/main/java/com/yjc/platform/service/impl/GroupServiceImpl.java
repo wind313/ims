@@ -58,12 +58,12 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         groupMember.setGroupId(group.getId());
         groupMember.setMemberId(userId);
         groupMember.setMemberNickname(user.getNickname());
-        groupMember.setRemark(name);
         groupMember.setHeadImage(user.getHeadImageThumb());
         groupMemberService.save(groupMember);
 
         GroupVO groupVO = BeanUtil.copyProperties(group,GroupVO.class);
         groupVO.setNicknameInGroup(user.getNickname());
+        groupVO.setRemark(name);
 
         return groupVO;
     }
@@ -74,6 +74,9 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         Long userId = SessionContext.getSession().getId();
         Group group = getById(groupVO.getId());
         if(userId == group.getOwnerId()){
+            if(groupVO.getOwnerId() != userId && groupMemberService.findByGroupIdAndUserId(groupVO.getId(),groupVO.getOwnerId())==null){
+                throw new GlobalException("对方不在群内，不能成为群主");
+            }
             Group group1 = BeanUtil.copyProperties(groupVO, Group.class);
             updateById(group1);
         }
@@ -91,7 +94,11 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
     public void delete(Long id) {
         Long userId = SessionContext.getSession().getId();
         Group group = getById(id);
-        if(group.getOwnerId() != userId){
+        Long ownerId = group.getOwnerId();
+        if(ownerId == null || group.getDeleted()){
+            throw new GlobalException("群聊不存在");
+        }
+        if(ownerId != userId){
             throw new GlobalException("你不是群主，无法解散群聊");
         }
         group.setDeleted(true);
@@ -140,6 +147,9 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
             throw new GlobalException("群主不能退出群聊");
         }
         GroupMember member = groupMemberService.findByGroupIdAndUserId(id, userId);
+        if(member == null) {
+            throw new GlobalException("你不是群成员");
+        }
         member.setQuit(true);
         groupMemberService.updateById(member);
 
@@ -178,7 +188,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
             GroupVO groupVO = BeanUtil.copyProperties(group, GroupVO.class);
             GroupMember member = groupMembers.stream()
                     .filter(groupMember -> groupMember.getGroupId().equals(group.getId())).findFirst().get();
-            groupVO.setRemark(member.getRemark());
+            groupVO.setRemark(member.getRemark().length() == 0?group.getName():member.getRemark());
             groupVO.setNicknameInGroup(member.getNicknameInGroup());
             return groupVO;
         }).collect(Collectors.toList());

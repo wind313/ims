@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yjc.common.constant.RedisKey;
 import com.yjc.platform.constants.JWTConstant;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.dto.LoginDto;
@@ -21,10 +22,12 @@ import com.yjc.platform.vo.LoginVO;
 import com.yjc.platform.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
@@ -36,6 +39,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
     @Autowired
     private GroupMemberService groupMemberService;
+
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Override
     public LoginVO login(LoginDto userDto) {
@@ -140,6 +146,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         user.setSignature(userVO.getSignature());
         updateById(user);
 
+    }
+
+    @Override
+    public List<Long> checkOnline(String userIds) {
+        String[] split = userIds.split(",");
+        LinkedList<Long> longs = new LinkedList<>();
+        for(String userId:split){
+            if(isOnline(Long.parseLong(userId))){
+                longs.add(Long.parseLong(userId));
+            }
+        }
+        return longs;
+    }
+
+    private boolean isOnline(long userId) {
+        String key = RedisKey.USER_SEVER_ID + userId;
+        Integer serverId = (Integer) redisTemplate.opsForValue().get(key);
+        return serverId!=null;
     }
 
     public User findById(Long id){

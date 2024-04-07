@@ -16,7 +16,7 @@ public class GroupMessage {
     @TableField("send_id")
     private Long sendId;
     @TableField("receive_id")
-    private Long receiveId;
+    private Long groupId;
     @TableField("content")
     private String content;
     @TableField("type")
