@@ -122,6 +122,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         GroupVO groupVO = BeanUtil.copyProperties(group, GroupVO.class);
         groupVO.setNicknameInGroup(member.getNicknameInGroup());
         groupVO.setRemark(member.getRemark());
+        if(member.getRemark().length() == 0) groupVO.setRemark(groupVO.getName());
         return groupVO;
     }
 

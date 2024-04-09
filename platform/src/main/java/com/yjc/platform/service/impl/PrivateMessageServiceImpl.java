@@ -16,6 +16,7 @@ import com.yjc.platform.service.PrivateMessageService;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.PrivateMessageVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper, PrivateMessage> implements PrivateMessageService {
 
     @Autowired
@@ -45,6 +47,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         PrivateMessage privateMessage = BeanUtil.copyProperties(privateMessageVO, PrivateMessage.class);
         privateMessage.setSendId(userId);
         privateMessage.setStatus(MessageStatus.UNREAD.code());
+        privateMessage.setSendTime(new Date());
         save(privateMessage);
 
         PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
@@ -99,6 +102,36 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
             sender.sendPrivateMessage(userId,arr);
         }
 
+    }
+
+    @Override
+    public List<PrivateMessageInfo> history(Long friendId, Long page, Long size) {
+        page = page>0?page:1;
+        size = size>0?size:10;
+        Long userId = SessionContext.getSession().getId();
+        long idx = (page - 1) * size;
+        QueryWrapper<PrivateMessage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .and(qWrapper->{
+                    qWrapper.and(wrapper->wrapper.eq(PrivateMessage::getSendId,userId)
+                                .eq(PrivateMessage::getReceiveId,friendId))
+                            .or(
+                                    wrapper->wrapper.eq(PrivateMessage::getReceiveId,userId)
+                                            .eq(PrivateMessage::getSendId,friendId)
+                            );
+                })
+                .ne(PrivateMessage::getStatus,MessageStatus.RECALL.code())
+                .orderByDesc(PrivateMessage::getId)
+                .last("limit " + idx + "," + size);
+        List<PrivateMessage> list = this.list(queryWrapper);
+
+        List<PrivateMessageInfo> collect = list.stream().map(message -> {
+            PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(message, PrivateMessageInfo.class);
+            return privateMessageInfo;
+
+        }).collect(Collectors.toList());
+
+        return collect;
     }
 
 

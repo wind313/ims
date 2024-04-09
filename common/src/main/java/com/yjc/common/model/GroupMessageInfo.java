@@ -10,7 +10,7 @@ import java.util.Date;
 public class GroupMessageInfo {
     private Long id;
     private Long sendId;
-    private Long receiveId;
+    private Long groupId;
     private String content;
     private Integer type;
     @JsonSerialize(using = DateToLongSerializer.class)

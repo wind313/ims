@@ -24,7 +24,7 @@ public class GroupMessageListener implements MessageListener {
         }
 
         if(resultInfo.getCode().equals(SendCode.SUCCESS)){
-            String key = RedisKey.GROUP_ALREADY_READ_POSITION + messageInfo.getReceiveId() + ":" + resultInfo.getReceiveId();
+            String key = RedisKey.GROUP_ALREADY_READ_POSITION + messageInfo.getGroupId() + ":" + resultInfo.getReceiveId();
             redisTemplate.opsForValue().set(key,messageInfo.getId());
         }
     }

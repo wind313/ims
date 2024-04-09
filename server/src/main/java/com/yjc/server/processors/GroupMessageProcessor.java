@@ -6,6 +6,7 @@ import com.yjc.common.enums.SendCode;
 import com.yjc.common.model.*;
 import com.yjc.server.utils.CtxMap;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@Slf4j
 public class GroupMessageProcessor extends AbstractProcessor<ReceiveInfo<GroupMessageInfo>> {
 
     @Autowired

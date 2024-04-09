@@ -16,4 +16,5 @@ public interface FriendService extends IService<Friend> {
 
     List<Friend> findByUserId(Long id);
 
+    FriendVO findByFriendId(Long friendId);
 }

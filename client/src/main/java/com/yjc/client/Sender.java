@@ -6,6 +6,7 @@ import com.yjc.common.enums.CommandType;
 import com.yjc.common.enums.ListenerType;
 import com.yjc.common.enums.SendCode;
 import com.yjc.common.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Slf4j
 public class Sender{
 
     @Autowired

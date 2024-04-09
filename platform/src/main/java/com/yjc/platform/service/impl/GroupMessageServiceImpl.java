@@ -13,6 +13,7 @@ import com.yjc.platform.mapper.GroupMessageMapper;
 import com.yjc.platform.pojo.Group;
 import com.yjc.platform.pojo.GroupMember;
 import com.yjc.platform.pojo.GroupMessage;
+import com.yjc.platform.pojo.PrivateMessage;
 import com.yjc.platform.service.GroupMemberService;
 import com.yjc.platform.service.GroupMessageService;
 import com.yjc.platform.service.GroupService;
@@ -58,10 +59,12 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
         }
         GroupMessage groupMessage = BeanUtil.copyProperties(groupMessageVO, GroupMessage.class);
         groupMessage.setSendId(userId);
+        groupMessage.setSendTime(new Date());
         save(groupMessage);
 
         list = list.stream().filter(id -> id != userId).collect(Collectors.toList());
         GroupMessageInfo groupMessageInfo = BeanUtil.copyProperties(groupMessage, GroupMessageInfo.class);
+        groupMessageInfo.setGroupId(groupMessageVO.getGroupId());
         sender.sendGroupMessage(list,groupMessageInfo);
 
         return groupMessage.getId();
@@ -133,5 +136,33 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
             sender.sendGroupMessage(Collections.singletonList(userId),array);
 
         }
+    }
+
+    @Override
+    public List<GroupMessageInfo> history(Long groupId, Long page, Long size) {
+
+        page = page>0?page:1;
+        size = size>0?size:10;
+        Long userId = SessionContext.getSession().getId();
+        long idx = (page - 1) * size;
+
+        GroupMember member = groupMemberService.findByGroupIdAndUserId(groupId, userId);
+        if(member == null || member.getQuit()){
+            throw new GlobalException("你不在群中");
+        }
+
+        QueryWrapper<GroupMessage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(GroupMessage::getGroupId,groupId)
+                .ne(GroupMessage::getStatus,MessageStatus.RECALL.code())
+                .gt(GroupMessage::getSendTime,member.getCreateTime())
+                .orderByDesc(GroupMessage::getId)
+                .last("limit "+idx +"," +size);
+        List<GroupMessage> list = this.list(queryWrapper);
+        List<GroupMessageInfo> collect = list.stream().map(message -> {
+            GroupMessageInfo groupMessageInfo = BeanUtil.copyProperties(message, GroupMessageInfo.class);
+            return groupMessageInfo;
+        }).collect(Collectors.toList());
+        return collect;
+
     }
 }

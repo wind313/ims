@@ -2,6 +2,7 @@ package com.yjc.platform.controller;
 
 import com.yjc.platform.pojo.Result;
 import com.yjc.platform.service.FriendService;
+import com.yjc.platform.service.UserService;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.FriendVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,7 @@ public class FriendController {
 
     @Autowired
     private FriendService friendService;
+
 
     @PutMapping("/add")
     @Operation(summary = "添加好友",description = "建立好友关系")
@@ -45,5 +47,11 @@ public class FriendController {
     public Result update(@Valid @RequestBody FriendVO friendVO){
         return ResultUtil.success();
     }
+
+    @GetMapping("/find/{friendId}")
+    public Result find(@NotNull(message = "好友id不能为空") @PathVariable("friendId") Long friendId){
+        return ResultUtil.success(friendService.findByFriendId(friendId));
+    }
+
 
 }
