@@ -160,12 +160,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         return longs;
     }
 
-    private boolean isOnline(long userId) {
+    @Override
+    public boolean isOnline(long userId) {
         String key = RedisKey.USER_SEVER_ID + userId;
         Integer serverId = (Integer) redisTemplate.opsForValue().get(key);
         return serverId!=null;
     }
-
+    @Override
     public User findById(Long id){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getId,id);

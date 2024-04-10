@@ -14,9 +14,9 @@ public enum MessageType {
     RTC_ACCEPT(102,"接受"),
     RTC_REJECT(103,"拒绝"),
     RTC_CANCEL(104,"取消"),
-    RTC_FAILED(8,"失败"),
-    RTC_HANGUP(9,"挂断"),
-    RTC_CANDIDATE(10,"同步candidate");
+    RTC_FAILED(105,"失败"),
+    RTC_HANGUP(106,"挂断"),
+    RTC_CANDIDATE(107,"同步candidate");
     private Integer code;
     private String desc;
 

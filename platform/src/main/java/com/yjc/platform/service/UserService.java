@@ -17,6 +17,9 @@ public interface UserService extends IService<User> {
     void register(LoginDto userDto);
 
     LoginVO refreshToken(String refreshToken);
+
+    boolean isOnline(long userId);
+
     User findById(Long id);
     User findByUsername(String username);
 

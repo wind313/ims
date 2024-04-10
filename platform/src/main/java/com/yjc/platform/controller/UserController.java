@@ -52,8 +52,8 @@ public class UserController {
     @Operation(summary = "查找用户",description = "根据用户名查找用户")
     public Result<UserVO> findByUsername(@NotBlank(message = "用户名不能为空") @RequestParam("username") String username){
         User user = userService.findByUsername(username);
-
         UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
+        userVO.setOnline(userService.isOnline(user.getId()));
         return ResultUtil.success(userVO);
     }
     @PutMapping("/update")

@@ -1,8 +1,8 @@
 package com.yjc.platform.controller;
 
+import com.yjc.platform.constants.RedisKey;
 import com.yjc.platform.pojo.Result;
 import com.yjc.platform.service.FriendService;
-import com.yjc.platform.service.UserService;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.FriendVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -32,7 +33,6 @@ public class FriendController {
     @GetMapping("/list")
     @Operation(summary = "好友列表",description = "获取好友列表")
     public Result<List<FriendVO>> list(){
-
         return ResultUtil.success(friendService.friends());
     }
 

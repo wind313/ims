@@ -2,6 +2,7 @@ package com.yjc.platform.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yjc.platform.constants.RedisKey;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.mapper.FriendMapper;
 import com.yjc.platform.pojo.Friend;
@@ -13,6 +14,10 @@ import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.FriendVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +27,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-//@CacheConfig(cacheNames = RedisKey.IM_FRIEND)
+@CacheConfig(cacheNames = RedisKey.IM_FRIEND)
 public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implements FriendService {
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Transactional
     @Override
@@ -40,7 +47,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         bind(friendId,userId);
     }
 
-//    @Cacheable(key = "#p0+':'+#p1")
+    @Cacheable(key = "#p0+':'+#p1")
     @Override
     public boolean isFriend(Long userId1, Long userId2) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
@@ -49,13 +56,13 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
                 .eq(Friend::getFriendId,userId2);
         return count(queryWrapper)>0;
     }
-//    @CacheEvict(key = "#p0+':'+#p1")
     public void bind(Long userId, Long friendId) {
         if(!isFriend(userId,friendId)){
             Friend friend = new Friend();
             friend.setUserId(userId);
             friend.setFriendId(friendId);
             save(friend);
+            redisTemplate.opsForValue().getAndDelete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
         }
         else{
             throw new GlobalException("对方已是你的好友");
@@ -96,8 +103,8 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         unbind(userId,friendId);
         unbind(friendId,userId);
     }
-//    @CacheEvict(key = "#p0+':'+#p1")
     public void unbind(Long userId,Long friendId){
+        log.info(userId.toString(),friendId);
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(Friend::getUserId,userId)
@@ -107,6 +114,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
             throw new GlobalException("对方不是你的好友");
         }
         removeById(one.getId());
+        redisTemplate.opsForValue().getAndDelete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
     }
 
     @Override

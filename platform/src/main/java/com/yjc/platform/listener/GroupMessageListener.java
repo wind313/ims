@@ -8,10 +8,12 @@ import com.yjc.common.enums.SendCode;
 import com.yjc.common.model.GroupMessageInfo;
 import com.yjc.common.model.ResultInfo;
 import com.yjc.platform.enums.MessageType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @Listener(type = ListenerType.GROUP)
+@Slf4j
 public class GroupMessageListener implements MessageListener {
 
     @Autowired

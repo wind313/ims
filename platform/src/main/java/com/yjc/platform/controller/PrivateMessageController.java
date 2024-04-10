@@ -47,7 +47,6 @@ public class PrivateMessageController {
     public Result history(@NotNull(message = "好友id不为空") @RequestParam("friendId") Long friendId,
                           @NotNull(message = "页码不能为空") @RequestParam("page") Long page,
                           @NotNull(message = "size不能为空") @RequestParam("size") Long size){
-        log.info("1");
         return ResultUtil.success(privateMessageService.history(friendId,page,size));
 
     }
