@@ -128,7 +128,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         if (user == null){
             throw new GlobalException("用户不存在");
         }
-        if(!user.getNickname().equals(userVO.getNickname()) || user.getHeadImageThumb().equals(userVO.getHeadImageThumb())){
+        if(!user.getNickname().equals(userVO.getNickname()) || !user.getHeadImageThumb().equals(userVO.getHeadImageThumb())){
             List<GroupMember> glist = groupMemberService.findByUserId(userVO.getId());
             for(GroupMember groupMember:glist){
                 groupMember.setHeadImage(userVO.getHeadImageThumb());

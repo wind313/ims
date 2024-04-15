@@ -62,7 +62,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
             friend.setUserId(userId);
             friend.setFriendId(friendId);
             save(friend);
-            redisTemplate.opsForValue().getAndDelete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
+            redisTemplate.delete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
         }
         else{
             throw new GlobalException("对方已是你的好友");
@@ -114,7 +114,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
             throw new GlobalException("对方不是你的好友");
         }
         removeById(one.getId());
-        redisTemplate.opsForValue().getAndDelete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
+        redisTemplate.delete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
     }
 
     @Override

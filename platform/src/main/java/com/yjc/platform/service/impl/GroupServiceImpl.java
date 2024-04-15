@@ -3,6 +3,7 @@ package com.yjc.platform.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjc.platform.constants.Constant;
+import com.yjc.platform.constants.RedisKey;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.mapper.GroupMapper;
 import com.yjc.platform.pojo.Friend;
@@ -20,6 +21,9 @@ import com.yjc.platform.vo.GroupMemberVO;
 import com.yjc.platform.vo.GroupVO;
 import com.yjc.platform.vo.InviteVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = RedisKey.IM_GROUP)
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements GroupService {
 
 
@@ -40,6 +45,9 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
 
     @Autowired
     private FriendService friendService;
+
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Transactional
     @Override
@@ -87,6 +95,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         member.setNicknameInGroup(groupVO.getNicknameInGroup());
         member.setRemark(groupVO.getRemark());
         groupMemberService.updateById(member);
+        redisTemplate.delete(RedisKey.IM_GROUP+"::"+groupVO.getId());
     }
 
     @Override
@@ -95,24 +104,31 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         Long userId = SessionContext.getSession().getId();
         Group group = getById(id);
         Long ownerId = group.getOwnerId();
-        if(ownerId == null || group.getDeleted()){
-            throw new GlobalException("群聊不存在");
-        }
         if(ownerId != userId){
             throw new GlobalException("你不是群主，无法解散群聊");
         }
         group.setDeleted(true);
         updateById(group);
         groupMemberService.deleteByGroupId(id);
+        redisTemplate.delete(RedisKey.IM_GROUP+"::"+id);
 
+    }
+    @Cacheable(key = "#p0")
+    public Group getById(Long id){
+        Group group = super.getById(id);
+        if(group == null){
+            throw new GlobalException("此群不存在");
+        }
+        if(group.getDeleted()){
+            throw new GlobalException("此群已解散");
+        }
+        return group;
     }
 
     @Override
     public GroupVO findById(Long id) {
         Group group = getById(id);
-        if(group.getDeleted()){
-            throw new GlobalException("此群已解散");
-        }
+
         Long userId = SessionContext.getSession().getId();
         GroupMember member = groupMemberService.findByGroupIdAndUserId(id, userId);
         if(member == null || member.getQuit()){
@@ -151,8 +167,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         if(member == null) {
             throw new GlobalException("你不是群成员");
         }
-        member.setQuit(true);
-        groupMemberService.updateById(member);
+        groupMemberService.removeMember(id,userId);
 
     }
 
@@ -170,8 +185,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         if(member == null || member.getQuit()){
             throw new GlobalException("用户不在群聊内");
         }
-        member.setQuit(true);
-        groupMemberService.updateById(member);
+        groupMemberService.removeMember(groupId,userId);
     }
 
     @Override
@@ -201,9 +215,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         Long userId = SessionContext.getSession().getId();
 
         Group group = getById(inviteVO.getGroupId());
-        if(group == null){
-            throw new GlobalException("群聊不存在");
-        }
         if(groupMemberService.findByGroupIdAndUserId(inviteVO.getGroupId(),userId) == null){
             throw new GlobalException("你不是群成员，无法邀请");
         }
@@ -241,6 +252,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
             member.setQuit(false);
             return member;
         }).collect(Collectors.toList());
-        groupMemberService.saveOrUpdateBatch(collect);
+        groupMemberService.saveOrUpdateBatch(group.getId(),collect);
     }
 }

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface GroupMemberService extends IService<GroupMember> {
 
+    void removeMember(Long groupId, Long userId);
+
     List<GroupMember> findByUserId(Long id);
 
     List<Long> findMemberIdsByGroupId(Long id);
@@ -16,4 +18,8 @@ public interface GroupMemberService extends IService<GroupMember> {
     GroupMember findByGroupIdAndUserId(Long groupId, Long userId);
 
     void deleteByGroupId(Long id);
+
+    boolean saveOrUpdateBatch(Long id, List<GroupMember> collect);
+
+
 }

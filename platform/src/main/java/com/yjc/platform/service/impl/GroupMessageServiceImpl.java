@@ -20,6 +20,7 @@ import com.yjc.platform.service.GroupService;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.GroupMessageVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, GroupMessage> implements GroupMessageService {
 
     @Autowired
@@ -119,19 +121,24 @@ public class GroupMessageServiceImpl extends ServiceImpl<GroupMessageMapper, Gro
             QueryWrapper<GroupMessage> queryWrapper = new QueryWrapper<>();
             queryWrapper.lambda()
                     .eq(GroupMessage::getGroupId,member.getGroupId())
-                    .gt(GroupMessage::getSendId,member.getCreateTime())
+                    .gt(GroupMessage::getSendTime,member.getCreateTime())
                     .ne(GroupMessage::getSendId,userId)
-                    .ne(GroupMessage::getStatus,MessageStatus.RECALL.code());
+                    .ne(GroupMessage::getStatus,MessageStatus.RECALL.code())
+                    .orderByDesc(GroupMessage::getId);
+
             if(maxReadId != null){
                 queryWrapper.lambda().gt(GroupMessage::getId,maxReadId);
             }
-            queryWrapper.last("limit 10");
+
+            queryWrapper.last("limit 100");
             List<GroupMessage> list = this.list(queryWrapper);
             if(list.isEmpty()) continue;
+
             List<GroupMessageInfo> collect = list.stream().map(groupMessage -> {
                 GroupMessageInfo groupMessageInfo = BeanUtil.copyProperties(groupMessage, GroupMessageInfo.class);
                 return groupMessageInfo;
             }).collect(Collectors.toList());
+            Collections.reverse(collect);
             GroupMessageInfo[] array = collect.toArray(new GroupMessageInfo[collect.size()]);
             sender.sendGroupMessage(Collections.singletonList(userId),array);
 
