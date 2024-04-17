@@ -9,15 +9,15 @@ import lombok.Data;
 @Schema(name = "用户登录VO")
 public class LoginVO {
     @NotBlank(message = "accessToken不能为空")
-    @Schema(name = "每次请求必须在请求头中携带accessToken")
+    @Schema(name = "accessToken")
     private String accessToken;
     @NotNull(message = "accessToken时间不能为空")
-    @Schema(name = "accessToken过期时间（秒）")
+    @Schema(name = "accessTokenExpiresIn")
     private Integer accessTokenExpiresIn;
     @NotBlank(message = "refreshTokenToken不能为空")
-    @Schema(name = "accessToken过期后，用refreshToken换取新的token")
+    @Schema(name = "refreshToken")
     private String refreshToken;
     @NotNull(message = "refreshToken时间不能为空")
-    @Schema(name = "refreshToken过期时间（）秒")
+    @Schema(name = "refreshTokenExpiresIn")
     private Integer refreshTokenExpiresIn;
 }

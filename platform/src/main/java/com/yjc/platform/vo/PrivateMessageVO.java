@@ -10,13 +10,13 @@ import org.hibernate.validator.constraints.Length;
 @Schema(name = "私人消息VO")
 public class PrivateMessageVO {
     @NotNull(message = "接收者id不能为空")
-    @Schema(name = "接收者id")
+    @Schema(name = "receiveId")
     private Long receiveId;
     @NotBlank(message = "消息内容不可为空")
     @Length(max = 1024,message = "内容长度不能大于1024")
-    @Schema(name = "消息内容")
+    @Schema(name = "content")
     private String content;
     @NotNull(message = "消息类型不能为空")
-    @Schema(name = "消息类型")
+    @Schema(name = "type")
     private Integer type;
 }

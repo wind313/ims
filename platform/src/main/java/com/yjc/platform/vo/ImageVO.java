@@ -10,10 +10,10 @@ import org.hibernate.validator.constraints.Length;
 public class ImageVO {
     @NotBlank(message = "url不能为空")
     @Length(max = 1024,message = "url长度不能大于1024")
-    @Schema(name = "原图url")
+    @Schema(name = "url")
     private String url;
     @Length(max = 1024,message = "缩略图url长度不能大于1024")
     @NotBlank(message = "thumbUrl不能为空")
-    @Schema(name = "缩略图url")
+    @Schema(name = "thumbUrl")
     private String thumbUrl;
 }

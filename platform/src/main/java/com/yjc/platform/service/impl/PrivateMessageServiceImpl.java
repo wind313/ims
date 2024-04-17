@@ -93,6 +93,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
                 .eq(PrivateMessage::getReceiveId,userId)
                 .eq(PrivateMessage::getStatus,MessageStatus.UNREAD);
         List<PrivateMessage> list = this.list(queryWrapper);
+
         if(!list.isEmpty()){
             List<PrivateMessageInfo> collect = list.stream().map(privateMessage -> {
                 PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);

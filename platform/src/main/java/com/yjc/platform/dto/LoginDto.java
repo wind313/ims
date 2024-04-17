@@ -8,9 +8,9 @@ import lombok.Data;
 @Schema(name = "用户登录注册VO")
 public class LoginDto {
     @NotBlank(message = "用户名不能为空")
-    @Schema(name = "用户名")
+    @Schema(name = "username")
     private String username;
     @NotBlank(message = "密码不能为空")
-    @Schema(name = "用户密码")
+    @Schema(name = "password")
     private String password;
 }

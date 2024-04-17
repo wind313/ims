@@ -11,9 +11,9 @@ import java.util.List;
 @Schema(name = "邀请好友进群VO")
 public class InviteVO {
     @NotNull(message = "群id不能为空")
-    @Schema( name= "群id")
+    @Schema( name= "groupId")
     private Long groupId;
     @NotEmpty(message = "邀请好友不能为空")
-    @Schema(name = "邀请的好友id")
+    @Schema(name = "ids")
     private List<Long> ids;
 }
