@@ -35,4 +35,5 @@ public class UserVO {
     @Schema(name = "online",description = "是否在线")
     private Boolean online;
 
+
 }

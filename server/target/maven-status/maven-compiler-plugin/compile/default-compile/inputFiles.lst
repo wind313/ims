@@ -16,4 +16,5 @@ E:\桌面\ims\server\src\main\java\com\yjc\server\websocket\handler\ChannelHandl
 E:\桌面\ims\server\src\main\java\com\yjc\server\processors\HeartBeatProcessor.java
 E:\桌面\ims\server\src\main\java\com\yjc\server\websocket\ServerGroup.java
 E:\桌面\ims\server\src\main\java\com\yjc\server\processors\PrivateMessageProcessor.java
+E:\桌面\ims\server\src\main\java\com\yjc\server\config\RabbitmqConfig.java
 E:\桌面\ims\server\src\main\java\com\yjc\server\websocket\code\Encoder.java

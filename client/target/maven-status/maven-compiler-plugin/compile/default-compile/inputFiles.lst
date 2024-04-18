@@ -6,4 +6,5 @@ E:\桌面\ims\client\src\main\java\com\yjc\client\listener\MessageListener.java
 E:\桌面\ims\client\src\main\java\com\yjc\client\task\PullPrivateResultTask.java
 E:\桌面\ims\client\src\main\java\com\yjc\client\ClientApplication.java
 E:\桌面\ims\client\src\main\java\com\yjc\client\config\RedisConfig.java
+E:\桌面\ims\client\src\main\java\com\yjc\client\config\RabbitmqConfig.java
 E:\桌面\ims\client\src\main\java\com\yjc\client\task\PullGroupResultTask.java

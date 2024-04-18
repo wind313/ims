@@ -23,6 +23,10 @@ spring:
     virtual-host: /yjc
     host: 139.9.136.188
     port: 5672
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
 
 minio:
   endpoint: http://139.9.136.188:9001

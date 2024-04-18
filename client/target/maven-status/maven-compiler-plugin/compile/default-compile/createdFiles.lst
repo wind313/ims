@@ -1,4 +1,5 @@
 com\yjc\client\annotation\Listener.class
+com\yjc\client\config\RabbitmqConfig.class
 com\yjc\client\Sender.class
 com\yjc\client\task\AbstractPullResultTask.class
 com\yjc\client\config\RedisConfig.class
