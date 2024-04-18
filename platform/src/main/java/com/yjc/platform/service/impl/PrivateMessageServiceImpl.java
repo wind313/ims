@@ -51,7 +51,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         save(privateMessage);
 
         PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
-        sender.sendPrivateMessage(privateMessageVO.getReceiveId(),privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
 
         return privateMessage.getId();
     }
@@ -76,7 +76,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         privateMessageInfo.setType(MessageType.TIP.getCode());
         privateMessageInfo.setContent("对方撤回了一条消息");
         privateMessageInfo.setSendTime(new Date());
-        sender.sendPrivateMessage(message.getReceiveId(),privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
 
     }
 
@@ -93,16 +93,10 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
                 .eq(PrivateMessage::getReceiveId,userId)
                 .eq(PrivateMessage::getStatus,MessageStatus.UNREAD);
         List<PrivateMessage> list = this.list(queryWrapper);
-
-        if(!list.isEmpty()){
-            List<PrivateMessageInfo> collect = list.stream().map(privateMessage -> {
-                PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
-                return privateMessageInfo;
-            }).collect(Collectors.toList());
-            PrivateMessageInfo[] arr = collect.toArray(new PrivateMessageInfo[list.size()]);
-            sender.sendPrivateMessage(userId,arr);
+        for(PrivateMessage privateMessage:list){
+            PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
+            sender.sendPrivateMessage(privateMessageInfo);
         }
-
     }
 
     @Override

@@ -27,7 +27,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setContent(offer);
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setContent(answer);
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setType(MessageType.RTC_REJECT.getCode());
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
 
     }
 
@@ -59,7 +59,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setType(MessageType.RTC_CANCEL.getCode());
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setContent(reason);
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setType(MessageType.RTC_HANGUP.getCode());
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class WebrtcServiceImpl implements WebrtcService {
         privateMessageInfo.setContent(candidate);
         privateMessageInfo.setReceiveId(uid);
         privateMessageInfo.setSendId(userId);
-        sender.sendPrivateMessage(uid,privateMessageInfo);
+        sender.sendPrivateMessage(privateMessageInfo);
     }
 
     @Override

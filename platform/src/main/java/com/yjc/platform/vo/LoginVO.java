@@ -12,12 +12,12 @@ public class LoginVO {
     @Schema(name = "accessToken")
     private String accessToken;
     @NotNull(message = "accessToken时间不能为空")
-    @Schema(name = "accessTokenExpiresIn")
+    @Schema(name = "accessTokenExpiresIn",description = "accessToken过期时间（秒）")
     private Integer accessTokenExpiresIn;
     @NotBlank(message = "refreshTokenToken不能为空")
     @Schema(name = "refreshToken")
     private String refreshToken;
     @NotNull(message = "refreshToken时间不能为空")
-    @Schema(name = "refreshTokenExpiresIn")
+    @Schema(name = "refreshTokenExpiresIn",description = "refreshToken过期时间（秒）")
     private Integer refreshTokenExpiresIn;
 }

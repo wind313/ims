@@ -17,6 +17,12 @@ spring:
       database: 3
   main:
     allow-circular-references: true
+  rabbitmq:
+    username: yjc
+    password: ROOT
+    virtual-host: /yjc
+    host: 139.9.136.188
+    port: 5672
 
 minio:
   endpoint: http://139.9.136.188:9001

@@ -40,7 +40,7 @@ public class PrivateMessageListener implements MessageListener {
                  privateMessageInfo.setContent(MessageType.RTC_FAILED.getDesc());
                  privateMessageInfo.setSendId(messageInfo.getReceiveId());
                  privateMessageInfo.setReceiveId(messageInfo.getSendId());
-                 sender.sendPrivateMessage(messageInfo.getSendId(),privateMessageInfo);
+                 sender.sendPrivateMessage(privateMessageInfo);
              }
          }
 

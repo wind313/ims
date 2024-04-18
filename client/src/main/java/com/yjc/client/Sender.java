@@ -7,6 +7,7 @@ import com.yjc.common.enums.ListenerType;
 import com.yjc.common.enums.SendCode;
 import com.yjc.common.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,33 +26,33 @@ public class Sender{
     @Autowired
     private MessageListenerMulticaster messageListenerMulticaster;
 
-    public void sendPrivateMessage(Long receiveId, PrivateMessageInfo... privateMessageInfos){
-        String key = RedisKey.USER_SEVER_ID + receiveId;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    private static final String exchange="yjc-im";
+    private static final String PRIVATE_ROUTING_KEY="private";
+    private static final String GROUP_ROUTING_KEY="group";
+
+    public void sendPrivateMessage(PrivateMessageInfo privateMessageInfo){
+        String key = RedisKey.USER_SEVER_ID + privateMessageInfo.getReceiveId();
         Integer serverId = (Integer) redisTemplate.opsForValue().get(key);
         if(serverId != null){
-            String sendKey = RedisKey.UNREAD_PRIVATE_QUEUE + serverId;
-            ReceiveInfo[] receiveInfos = new ReceiveInfo[privateMessageInfos.length];
-            for(int i=0;i<privateMessageInfos.length;i++){
-                ReceiveInfo<PrivateMessageInfo> receiveInfo = new ReceiveInfo<>();
-                receiveInfo.setCmd(CommandType.PRIVATE_MESSAGE.getCode());
-                receiveInfo.setData(privateMessageInfos[i]);
-                LinkedList<Long> ids = new LinkedList<>();
-                ids.add(receiveId);
-                receiveInfo.setReceiveIds(ids);
-                receiveInfos[i] = receiveInfo;
-            }
-
-            redisTemplate.opsForList().rightPushAll(sendKey,receiveInfos);
+            String sendKey = PRIVATE_ROUTING_KEY + serverId;
+            log.info(sendKey);
+            ReceiveInfo<PrivateMessageInfo> receiveInfo = new ReceiveInfo<>();
+            receiveInfo.setCmd(CommandType.PRIVATE_MESSAGE.getCode());
+            receiveInfo.setData(privateMessageInfo);
+            LinkedList<Long> ids = new LinkedList<>();
+            ids.add(privateMessageInfo.getReceiveId());
+            receiveInfo.setReceiveIds(ids);
+            rabbitTemplate.convertAndSend(exchange+serverId,sendKey,receiveInfo);
         }
         else {
-            for(PrivateMessageInfo privateMessageInfo:privateMessageInfos){
-                ResultInfo<PrivateMessageInfo> resultInfo = new ResultInfo<>();
-                resultInfo.setReceiveId(receiveId);
-                resultInfo.setCode(SendCode.NOT_ONLINE);
-                resultInfo.setMessageInfo(privateMessageInfo);
-                messageListenerMulticaster.multicast(ListenerType.PRIVATE,resultInfo);
-            }
-
+            ResultInfo<PrivateMessageInfo> resultInfo = new ResultInfo<>();
+            resultInfo.setReceiveId(privateMessageInfo.getReceiveId());
+            resultInfo.setCode(SendCode.NOT_ONLINE);
+            resultInfo.setMessageInfo(privateMessageInfo);
+            messageListenerMulticaster.multicast(ListenerType.PRIVATE,resultInfo);
         }
     }
 
@@ -78,16 +79,15 @@ public class Sender{
             }
         });
         for(Map.Entry<Integer,List<Long>> entry:map.entrySet()){
-            ReceiveInfo[] receiveInfos = new ReceiveInfo[groupMessageInfos.length];
+            String sendKey = GROUP_ROUTING_KEY + entry.getKey();
+            String exchangeName = exchange+entry.getKey();
             for(int i=0;i<groupMessageInfos.length;i++){
                 ReceiveInfo<GroupMessageInfo> receiveInfo = new ReceiveInfo<>();
                 receiveInfo.setCmd(CommandType.GROUP_MESSAGE.getCode());
                 receiveInfo.setReceiveIds(new LinkedList<>(entry.getValue()));
                 receiveInfo.setData(groupMessageInfos[i]);
-                receiveInfos[i] = receiveInfo;
+                rabbitTemplate.convertAndSend(exchangeName, sendKey,receiveInfo);
             }
-            String key = RedisKey.UNREAD_GROUP_QUEUE + entry.getKey();
-            redisTemplate.opsForList().rightPushAll(key,receiveInfos);
         }
         for(GroupMessageInfo groupMessageInfo:groupMessageInfos){
             for(Long id:offLineIds){
