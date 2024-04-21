@@ -16,12 +16,5 @@ spring:
     virtual-host: /yjc
     host: 139.9.136.188
     port: 5672
-    exchange: yjc-im
-    private:
-      queue: private27
-      key: private27
-    group:
-      queue: group27
-      key: group27
   main:
     allow-circular-references: true
