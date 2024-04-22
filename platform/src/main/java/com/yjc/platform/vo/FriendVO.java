@@ -16,4 +16,6 @@ public class   FriendVO {
     private String nickname;
     @Schema(name = "headImage",description = "好友头像")
     private String headImage;
+    @Schema(name = "signature",description = "好友个性签名")
+    private String signature;
 }

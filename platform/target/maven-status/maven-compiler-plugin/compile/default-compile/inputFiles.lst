@@ -20,6 +20,7 @@ E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\GroupMemberSe
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\GroupServiceImpl.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\vo\LoginVO.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\constants\RedisKey.java
+E:\桌面\ims\platform\src\main\java\com\yjc\platform\constants\AiConstant.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\constants\JWTConstant.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\enums\ResultCode.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\mapper\PrivateMessageMapper.java
@@ -28,6 +29,7 @@ E:\桌面\ims\platform\src\main\java\com\yjc\platform\vo\PrivateMessageVO.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\vo\UserVO.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\pojo\Result.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\exceptions\GlobalException.java
+E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\AiServiceImpl.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\FileServiceImpl.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\pojo\ICEServer.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\pojo\PrivateMessage.java
@@ -52,7 +54,9 @@ E:\桌面\ims\platform\src\main\java\com\yjc\platform\config\MinioConfig.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\util\BeanUtil.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\config\SecurityConfig.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\FriendServiceImpl.java
+E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\AiService.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\constants\Constant.java
+E:\桌面\ims\platform\src\main\java\com\yjc\platform\controller\AiController.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\WebrtcServiceImpl.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\controller\FriendController.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\PlatformApplication.java

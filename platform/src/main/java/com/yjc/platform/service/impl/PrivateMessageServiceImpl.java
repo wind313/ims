@@ -11,11 +11,14 @@ import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.enums.MessageStatus;
 import com.yjc.platform.mapper.PrivateMessageMapper;
 import com.yjc.platform.pojo.PrivateMessage;
+import com.yjc.platform.service.AiService;
 import com.yjc.platform.service.FriendService;
 import com.yjc.platform.service.PrivateMessageService;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.PrivateMessageVO;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,13 +41,38 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
     private Sender sender;
 
     @Autowired
-    RedisTemplate<String,Object> redisTemplate;
+    private RedisTemplate<String,Object> redisTemplate;
 
+    @Autowired
+    private AiService aiService;
+
+    private static final Long AiId = 2L;
+
+    private ExecutorService executorService;
+
+    @PostConstruct
+    public void init(){
+        executorService = Executors.newFixedThreadPool(1);
+    }
     @Override
     public Long send(PrivateMessageVO privateMessageVO) {
         Long userId = SessionContext.getSession().getId();
         if(!friendService.isFriend(userId,privateMessageVO.getReceiveId())){
             throw new GlobalException("对方不是你的好友");
+        }
+        if(privateMessageVO.getReceiveId().equals(AiId)){
+            PrivateMessage send = aiService.send(userId,AiId, privateMessageVO.getContent());
+            PrivateMessageInfo sendInfo = BeanUtil.copyProperties(send, PrivateMessageInfo.class);
+            sender.sendPrivateMessage(sendInfo);
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    PrivateMessage response = aiService.response(userId,AiId, privateMessageVO.getContent());
+                    PrivateMessageInfo responseInfo = BeanUtil.copyProperties(response, PrivateMessageInfo.class);
+                    sender.sendPrivateMessage(responseInfo);
+                }
+            });
+            return send.getId();
         }
         PrivateMessage privateMessage = BeanUtil.copyProperties(privateMessageVO, PrivateMessage.class);
         privateMessage.setSendId(userId);
@@ -100,10 +130,9 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
     }
 
     @Override
-    public List<PrivateMessageInfo> history(Long friendId, Long page, Long size) {
+    public List<PrivateMessageInfo> history(Long userId,Long friendId, Long page, Long size) {
         page = page>0?page:1;
         size = size>0?size:10;
-        Long userId = SessionContext.getSession().getId();
         long idx = (page - 1) * size;
         QueryWrapper<PrivateMessage> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
@@ -129,5 +158,10 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         return collect;
     }
 
+    @PreDestroy
+    public void destroy(){
+        log.info("{}线程任务关闭",this.getClass().getSimpleName());
+        executorService.shutdown();
+    }
 
 }

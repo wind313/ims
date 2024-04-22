@@ -91,6 +91,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
 
             friendVO.setNickname(user1.getNickname());
             friendVO.setHeadImage(user1.getHeadImageThumb());
+            friendVO.setSignature(user1.getSignature());
             return friendVO;
         }).collect(Collectors.toList());
         return l;
@@ -139,6 +140,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         friendVO.setFriendId(friendId);
         friendVO.setNickname(user.getNickname());
         friendVO.setHeadImage(user.getHeadImageThumb());
+        friendVO.setSignature(user.getSignature());
         return friendVO;
     }
 

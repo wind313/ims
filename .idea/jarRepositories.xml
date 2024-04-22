@@ -12,6 +12,11 @@
       <option name="url" value="https://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="spring-snapshots" />
+      <option name="name" value="Spring Snapshots" />
+      <option name="url" value="https://repo.spring.io/snapshot" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="aliyun-maven" />
       <option name="name" value="aliyun maven" />
       <option name="url" value="http://maven.aliyun.com/nexus/content/groups/public/" />

@@ -14,5 +14,5 @@ public interface PrivateMessageService extends IService<PrivateMessage> {
 
     void pullUnreadMessage();
 
-    List<PrivateMessageInfo> history(Long friendId, Long page, Long size);
+    List<PrivateMessageInfo> history(Long userId,Long friendId, Long page, Long size);
 }

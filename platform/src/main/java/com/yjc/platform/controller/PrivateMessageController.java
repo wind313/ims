@@ -2,6 +2,7 @@ package com.yjc.platform.controller;
 
 import com.yjc.platform.pojo.Result;
 import com.yjc.platform.service.PrivateMessageService;
+import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.ResultUtil;
 import com.yjc.platform.vo.PrivateMessageVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +48,8 @@ public class PrivateMessageController {
     public Result history(@NotNull(message = "好友id不为空") @RequestParam("friendId") Long friendId,
                           @NotNull(message = "页码不能为空") @RequestParam("page") Long page,
                           @NotNull(message = "size不能为空") @RequestParam("size") Long size){
-        return ResultUtil.success(privateMessageService.history(friendId,page,size));
+        Long userId = SessionContext.getSession().getId();
+        return ResultUtil.success(privateMessageService.history(userId,friendId,page,size));
 
     }
 

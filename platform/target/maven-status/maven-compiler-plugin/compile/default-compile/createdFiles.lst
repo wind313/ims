@@ -6,6 +6,7 @@ com\yjc\platform\vo\GroupMemberVO.class
 com\yjc\platform\PlatformApplication.class
 com\yjc\platform\session\SessionContext.class
 com\yjc\platform\controller\GroupMessageController.class
+com\yjc\platform\constants\AiConstant.class
 META-INF\spring-configuration-metadata.json
 com\yjc\platform\mapper\GroupMapper.class
 com\yjc\platform\config\RedisConfig.class
@@ -21,7 +22,9 @@ com\yjc\platform\util\ResultUtil.class
 com\yjc\platform\constants\RedisKey.class
 com\yjc\platform\controller\WebrtcController.class
 com\yjc\platform\service\impl\FileServiceImpl.class
+com\yjc\platform\service\impl\AiServiceImpl.class
 com\yjc\platform\service\impl\WebrtcServiceImpl.class
+com\yjc\platform\service\impl\PrivateMessageServiceImpl$1.class
 com\yjc\platform\vo\ImageVO.class
 com\yjc\platform\enums\MessageStatus.class
 com\yjc\platform\service\WebrtcService.class
@@ -63,9 +66,11 @@ com\yjc\platform\service\GroupMessageService.class
 com\yjc\platform\vo\GroupVO.class
 com\yjc\platform\interceptor\AuthInterceptor.class
 com\yjc\platform\pojo\PrivateMessage.class
+com\yjc\platform\service\AiService.class
 com\yjc\platform\controller\PrivateMessageController.class
 com\yjc\platform\config\GlobalCorsConfig.class
 com\yjc\platform\vo\InviteVO.class
+com\yjc\platform\controller\AiController.class
 com\yjc\platform\dto\LoginDto.class
 com\yjc\platform\service\GroupMemberService.class
 com\yjc\platform\util\JWTUtil.class
