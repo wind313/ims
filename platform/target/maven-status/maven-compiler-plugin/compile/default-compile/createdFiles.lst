@@ -24,7 +24,7 @@ com\yjc\platform\controller\WebrtcController.class
 com\yjc\platform\service\impl\FileServiceImpl.class
 com\yjc\platform\service\impl\AiServiceImpl.class
 com\yjc\platform\service\impl\WebrtcServiceImpl.class
-com\yjc\platform\service\impl\PrivateMessageServiceImpl$1.class
+com\yjc\platform\listener\AiListener$1.class
 com\yjc\platform\vo\ImageVO.class
 com\yjc\platform\enums\MessageStatus.class
 com\yjc\platform\service\WebrtcService.class
@@ -58,6 +58,7 @@ com\yjc\platform\controller\FriendController.class
 com\yjc\platform\service\impl\GroupMemberServiceImpl.class
 com\yjc\platform\util\BeanUtil.class
 com\yjc\platform\config\ICEServerConfig.class
+com\yjc\platform\listener\AiListener.class
 com\yjc\platform\service\GroupService.class
 com\yjc\platform\controller\GroupController.class
 com\yjc\platform\enums\MessageType.class

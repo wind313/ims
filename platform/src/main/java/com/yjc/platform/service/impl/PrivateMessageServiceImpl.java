@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjc.client.Sender;
 import com.yjc.common.constant.RedisKey;
 import com.yjc.common.model.PrivateMessageInfo;
+import com.yjc.platform.constants.AiConstant;
 import com.yjc.platform.constants.Constant;
 import com.yjc.platform.enums.MessageType;
 import com.yjc.platform.exceptions.GlobalException;
@@ -20,6 +21,7 @@ import com.yjc.platform.vo.PrivateMessageVO;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -44,16 +46,14 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
     private RedisTemplate<String,Object> redisTemplate;
 
     @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
     private AiService aiService;
+
 
     private static final Long AiId = 2L;
 
-    private ExecutorService executorService;
-
-    @PostConstruct
-    public void init(){
-        executorService = Executors.newFixedThreadPool(1);
-    }
     @Override
     public Long send(PrivateMessageVO privateMessageVO) {
         Long userId = SessionContext.getSession().getId();
@@ -63,15 +63,7 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         if(privateMessageVO.getReceiveId().equals(AiId)){
             PrivateMessage send = aiService.send(userId,AiId, privateMessageVO.getContent());
             PrivateMessageInfo sendInfo = BeanUtil.copyProperties(send, PrivateMessageInfo.class);
-            sender.sendPrivateMessage(sendInfo);
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    PrivateMessage response = aiService.response(userId,AiId, privateMessageVO.getContent());
-                    PrivateMessageInfo responseInfo = BeanUtil.copyProperties(response, PrivateMessageInfo.class);
-                    sender.sendPrivateMessage(responseInfo);
-                }
-            });
+            rabbitTemplate.convertAndSend(AiConstant.exchangeName,AiConstant.key,sendInfo);
             return send.getId();
         }
         PrivateMessage privateMessage = BeanUtil.copyProperties(privateMessageVO, PrivateMessage.class);
@@ -156,12 +148,6 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
         }).collect(Collectors.toList());
 
         return collect;
-    }
-
-    @PreDestroy
-    public void destroy(){
-        log.info("{}线程任务关闭",this.getClass().getSimpleName());
-        executorService.shutdown();
     }
 
 }

@@ -27,9 +27,6 @@ import java.util.List;
 public class PullPrivateMessageTask extends AbstractPullMessageTask {
 
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
-
-    @Autowired
     private RabbitTemplate rabbitTemplate;
 
     @Autowired

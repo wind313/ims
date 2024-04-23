@@ -61,6 +61,7 @@ E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\WebrtcService
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\controller\FriendController.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\PlatformApplication.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\service\impl\UserServiceImpl.java
+E:\桌面\ims\platform\src\main\java\com\yjc\platform\listener\AiListener.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\enums\FileType.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\pojo\GroupMessage.java
 E:\桌面\ims\platform\src\main\java\com\yjc\platform\mapper\GroupMessageMapper.java
