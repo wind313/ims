@@ -64,7 +64,7 @@ public class FileServiceImpl implements FileService {
             return imageVO;
         }catch (Exception e){
             log.error("上传失败，{}",e.getMessage(),e);
-            throw new GlobalException("图片上传失败");
+            throw new GlobalException(e.getMessage());
         }
 
 

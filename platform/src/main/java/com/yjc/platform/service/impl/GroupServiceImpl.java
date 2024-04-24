@@ -222,13 +222,17 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
             throw new GlobalException("不能邀请自己");
         }
 
+        if(inviteVO.getIds().contains(1) ||inviteVO.getIds().contains(2)){
+            throw new GlobalException("不能邀请AI");
+        }
         List<GroupMember> members = groupMemberService.findByGroupId(inviteVO.getGroupId());
         long size = members.stream().filter(member->!member.getQuit()).count();
         if(size + (long) inviteVO.getIds().size() > Constant.MAX_GROUP_MEMBER){
             throw new GlobalException("群聊人数不能大于"+Constant.MAX_GROUP_MEMBER+"人，邀请失败");
         }
 
-        List<Friend> friends = friendService.findByUserId(userId);
+        List<Friend> friends = friendService.findFriendByUserId(userId);
+
         try{
             inviteVO.getIds().stream()
                     .map(id -> friends.stream().filter(friend -> friend.getFriendId().equals(id)).findFirst().get())

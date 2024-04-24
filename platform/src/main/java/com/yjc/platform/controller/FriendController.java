@@ -24,21 +24,15 @@ public class FriendController {
 
 
     @PutMapping("/add")
-    @Operation(summary = "添加好友",description = "建立好友关系")
-    public Result add(@NotNull(message = "好友id不能为空") @RequestParam("friendId") Long friendId){
+    @Operation(summary = "关注",description = "关注对方")
+    public Result add(@NotNull(message = "对方id不能为空") @RequestParam("friendId") Long friendId){
         friendService.add(friendId);
         return ResultUtil.success();
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "好友列表",description = "获取好友列表")
-    public Result<List<FriendVO>> list(){
-        return ResultUtil.success(friendService.friends());
-    }
-
     @DeleteMapping("/delete/{friendId}")
-    @Operation(summary = "删除好友",description = "删除好友关系")
-    public Result delete(@NotNull(message = "好友id不能为空") @PathVariable("friendId") Long friendId){
+    @Operation(summary = "取消关注",description = "取消关注")
+    public Result delete(@NotNull(message = "对方id不能为空") @PathVariable("friendId") Long friendId){
         friendService.delete(friendId);
         return ResultUtil.success();
     }
@@ -47,10 +41,28 @@ public class FriendController {
     public Result update(@Valid @RequestBody FriendVO friendVO){
         return ResultUtil.success();
     }
-
+    @Operation(summary = "查找关注用户",description = "查找关注用户信息")
     @GetMapping("/find/{friendId}")
-    public Result find(@NotNull(message = "好友id不能为空") @PathVariable("friendId") Long friendId){
+    public Result find(@NotNull(message = "对方id不能为空") @PathVariable("friendId") Long friendId){
         return ResultUtil.success(friendService.findByFriendId(friendId));
+    }
+
+    @GetMapping("/concerns")
+    @Operation(summary = "关注列表",description = "获取关注列表")
+    public Result<List<FriendVO>> concerns(){
+        return ResultUtil.success(friendService.concerns());
+    }
+
+    @GetMapping("/fans")
+    @Operation(summary = "粉丝列表",description = "获取粉丝列表")
+    public Result<List<FriendVO>> fans(){
+        return ResultUtil.success(friendService.fans());
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "互关列表",description = "获取互关列表")
+    public Result<List<FriendVO>> list(){
+        return ResultUtil.success(friendService.friends());
     }
 
 

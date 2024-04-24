@@ -15,11 +15,9 @@ import com.yjc.platform.vo.FriendVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,28 +34,42 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
 
-    @Transactional
     @Override
     public void add(Long friendId) {
         long userId = SessionContext.getSession().getId();
         if(userId == friendId){
-            throw new GlobalException("不能加自己为好友");
+            throw new GlobalException("不能关注自己");
         }
         bind(userId,friendId);
-        bind(friendId,userId);
     }
 
-    @Cacheable(key = "#p0+':'+#p1")
     @Override
-    public boolean isFriend(Long userId1, Long userId2) {
+    public boolean isConcern(Long userId1, Long userId2) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(Friend::getUserId,userId1)
                 .eq(Friend::getFriendId,userId2);
         return count(queryWrapper)>0;
     }
+
+    @Override
+    public boolean isFans(Long userId1, Long userId2) {
+        QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .eq(Friend::getUserId,userId2)
+                .eq(Friend::getFriendId,userId1);
+        return count(queryWrapper)>0;
+    }
+
+    @Override
+    @Cacheable(key = "#p0+':'+#p1")
+    public boolean isFriend(Long userId1, Long userId2) {
+
+        return isConcern(userId1,userId2) && isFans(userId1,userId2);
+    }
+
     public void bind(Long userId, Long friendId) {
-        if(!isFriend(userId,friendId)){
+        if(!isConcern(userId,friendId)){
             Friend friend = new Friend();
             friend.setUserId(userId);
             friend.setFriendId(friendId);
@@ -65,16 +77,23 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
             redisTemplate.delete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
         }
         else{
-            throw new GlobalException("对方已是你的好友");
+            throw new GlobalException("你已关注对方");
         }
     }
-
-
-    @Override
-    public List<FriendVO> friends() {
+    public List<FriendVO> getList(int type) {
         Long userId = SessionContext.getSession().getId();
 
-        List<Friend> list = findByUserId(userId);
+        List<Friend> list = null;
+        if(type == 0){
+            list = findConcernsByUserId(userId);
+        }
+        else if(type == 1){
+            list = findFansByUserId(userId);
+        }
+        else if(type == 2){
+            list = findFriendByUserId(userId);
+        }
+
         if(list == null || list.size() == 0){
             return Collections.EMPTY_LIST;
         }
@@ -97,12 +116,10 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         return l;
     }
 
-    @Transactional
     @Override
     public void delete(Long friendId) {
         Long userId = SessionContext.getSession().getId();
         unbind(userId,friendId);
-        unbind(friendId,userId);
     }
     public void unbind(Long userId,Long friendId){
         log.info(userId.toString(),friendId);
@@ -119,10 +136,31 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
     }
 
     @Override
-    public List<Friend> findByUserId(Long id){
+    public List<Friend> findConcernsByUserId(Long id){
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Friend::getUserId,id);
+
         return list(queryWrapper);
+    }
+
+    @Override
+    public List<Friend> findFansByUserId(Long id){
+        QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Friend::getFriendId,id);
+        return list(queryWrapper);
+    }
+
+    @Override
+    public List<Friend> findFriendByUserId(Long id){
+        List<Friend> concerns = findConcernsByUserId(id);
+        List<Friend> fans = findFansByUserId(id);
+        List<Friend> result = concerns.stream()
+                .filter(concern -> fans.stream()
+                        .anyMatch(fan -> concern.getUserId().equals(fan.getFriendId()) && concern.getFriendId().equals(fan.getUserId()))
+                )
+                .collect(Collectors.toList());
+
+        return result;
     }
 
     @Override
@@ -142,6 +180,21 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
         friendVO.setHeadImage(user.getHeadImageThumb());
         friendVO.setSignature(user.getSignature());
         return friendVO;
+    }
+
+    @Override
+    public List<FriendVO> concerns(){
+        return getList(0);
+    }
+
+    @Override
+    public List<FriendVO> fans() {
+        return getList(1);
+    }
+
+    @Override
+    public List<FriendVO> friends() {
+        return getList(2);
     }
 
 

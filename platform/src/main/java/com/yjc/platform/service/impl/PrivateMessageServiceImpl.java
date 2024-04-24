@@ -57,15 +57,20 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
     @Override
     public Long send(PrivateMessageVO privateMessageVO) {
         Long userId = SessionContext.getSession().getId();
-        if(!friendService.isFriend(userId,privateMessageVO.getReceiveId())){
-            throw new GlobalException("对方不是你的好友");
-        }
         if(privateMessageVO.getReceiveId().equals(AiId)){
             PrivateMessage send = aiService.send(userId,AiId, privateMessageVO.getContent());
             PrivateMessageInfo sendInfo = BeanUtil.copyProperties(send, PrivateMessageInfo.class);
             rabbitTemplate.convertAndSend(AiConstant.exchangeName,AiConstant.key,sendInfo);
             return send.getId();
         }
+        Boolean o = (Boolean)redisTemplate.opsForValue().get("im:friend::" + userId + ":" + privateMessageVO.getReceiveId());
+        if(o == null){
+            friendService.isFriend(userId,privateMessageVO.getReceiveId());
+        }
+        else if(o.equals(false)){
+            throw new GlobalException("未互关，发送消息已达上限");
+        }
+
         PrivateMessage privateMessage = BeanUtil.copyProperties(privateMessageVO, PrivateMessage.class);
         privateMessage.setSendId(userId);
         privateMessage.setStatus(MessageStatus.UNREAD.code());
