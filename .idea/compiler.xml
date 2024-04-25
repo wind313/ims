@@ -13,10 +13,13 @@
         <module name="platform" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="17">
+      <module name="ai" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ai" options="-parameters" />
       <module name="client" options="" />
       <module name="common" options="" />
       <module name="server" options="" />

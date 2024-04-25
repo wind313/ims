@@ -20,12 +20,12 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
-        String token = request.getHeader("accessToken");
+        String token = request.getHeader("Authorization");
         if(token == null){
             throw new GlobalException(ResultCode.NOT_LOGIN);
         }
         try{
-            JWTUtil.search(token, JWTConstant.ACCESS_TOKEN_SECRET);
+            JWTUtil.search(token, JWTConstant.AUTHORIZATION_SECRET);
         }
         catch (JWTVerificationException e){
             throw new GlobalException(ResultCode.INVALID_TOKEN);

@@ -17,9 +17,9 @@ const http = axios.create({
  * 请求拦截
  */
 http.interceptors.request.use(config => {
-	let accessToken = sessionStorage.getItem("accessToken");
-	if (accessToken) {
-		config.headers.accessToken = encodeURIComponent(accessToken);
+	let Authorization = sessionStorage.getItem("Authorization");
+	if (Authorization) {
+		config.headers.Authorization = encodeURIComponent(Authorization);
 	}
 	return config
 }, error => {
@@ -49,7 +49,7 @@ http.interceptors.response.use(async response => {
 			}
 		})
 		// 保存token
-		sessionStorage.setItem("accessToken", data.accessToken);
+		sessionStorage.setItem("Authorization", data.authorization);
 		sessionStorage.setItem("refreshToken", data.refreshToken);
 		// 这里需要把headers清掉，否则请求时会报错，原因暂不详...
 		response.config.headers=undefined;

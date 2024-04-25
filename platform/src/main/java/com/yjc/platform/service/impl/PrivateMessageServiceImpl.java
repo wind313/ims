@@ -10,6 +10,7 @@ import com.yjc.platform.constants.Constant;
 import com.yjc.platform.enums.MessageType;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.enums.MessageStatus;
+import com.yjc.platform.listener.AiListener;
 import com.yjc.platform.mapper.PrivateMessageMapper;
 import com.yjc.platform.pojo.PrivateMessage;
 import com.yjc.platform.service.AiService;
@@ -58,10 +59,10 @@ public class PrivateMessageServiceImpl extends ServiceImpl<PrivateMessageMapper,
     public Long send(PrivateMessageVO privateMessageVO) {
         Long userId = SessionContext.getSession().getId();
         if(privateMessageVO.getReceiveId().equals(AiId)){
-            PrivateMessage send = aiService.send(userId,AiId, privateMessageVO.getContent());
-            PrivateMessageInfo sendInfo = BeanUtil.copyProperties(send, PrivateMessageInfo.class);
+            PrivateMessageInfo sendInfo = aiService.send(userId,AiId, privateMessageVO.getContent());
+
             rabbitTemplate.convertAndSend(AiConstant.exchangeName,AiConstant.key,sendInfo);
-            return send.getId();
+            return sendInfo.getId();
         }
         Boolean o = (Boolean)redisTemplate.opsForValue().get("im:friend::" + userId + ":" + privateMessageVO.getReceiveId());
         if(o == null){

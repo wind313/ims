@@ -59,12 +59,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         Session session = BeanUtil.copyProperties(user,Session.class);
 
         String json = JSON.toJSONString(session);
-        String accessToken = JWTUtil.sign(user.getId(),json, JWTConstant.ACCESS_TOKEN_EXPIRE,JWTConstant.ACCESS_TOKEN_SECRET);
+        String authorization = JWTUtil.sign(user.getId(),json, JWTConstant.AUTHORIZATION_EXPIRE,JWTConstant.AUTHORIZATION_SECRET);
         String refreshToken = JWTUtil.sign(user.getId(),json, JWTConstant.REFRESH_TOKEN_EXPIRE,JWTConstant.REFRESH_TOKEN_SECRET);
         LoginVO loginVO = new LoginVO();
-        loginVO.setAccessToken(accessToken);
+        loginVO.setAuthorization(authorization);
         loginVO.setRefreshToken(refreshToken);
-        loginVO.setAccessTokenExpiresIn(JWTConstant.ACCESS_TOKEN_EXPIRE);
+        loginVO.setAuthorizationExpiresIn(JWTConstant.AUTHORIZATION_EXPIRE);
         loginVO.setRefreshTokenExpiresIn(JWTConstant.REFRESH_TOKEN_EXPIRE);
         log.info("登陆成功");
         return loginVO;
@@ -92,13 +92,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
             JWTUtil.search(refreshToken,JWTConstant.REFRESH_TOKEN_SECRET);
             Long userId = JWTUtil.getId(refreshToken);
             String info = JWTUtil.getInfo(refreshToken);
-            String accessToken = JWTUtil.sign(userId, info, JWTConstant.ACCESS_TOKEN_EXPIRE, JWTConstant.ACCESS_TOKEN_SECRET);
+            String authorization = JWTUtil.sign(userId, info, JWTConstant.AUTHORIZATION_EXPIRE, JWTConstant.AUTHORIZATION_SECRET);
             String newRefreshToken = JWTUtil.sign(userId, info, JWTConstant.REFRESH_TOKEN_EXPIRE, JWTConstant.REFRESH_TOKEN_SECRET);
 
             LoginVO loginVO = new LoginVO();
-            loginVO.setAccessToken(accessToken);
+            loginVO.setAuthorization(authorization);
             loginVO.setRefreshToken(newRefreshToken);
-            loginVO.setAccessTokenExpiresIn(JWTConstant.ACCESS_TOKEN_EXPIRE);
+            loginVO.setAuthorizationExpiresIn(JWTConstant.AUTHORIZATION_EXPIRE);
             loginVO.setRefreshTokenExpiresIn(JWTConstant.REFRESH_TOKEN_EXPIRE);
             return loginVO;
         }

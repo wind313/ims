@@ -13,7 +13,6 @@ public class PrivateMessageVO {
     @Schema(name = "receiveId",description = "接收者id")
     private Long receiveId;
     @NotBlank(message = "消息内容不可为空")
-    @Length(max = 1024,message = "内容长度不能大于1024")
     @Schema(name = "content",description = "内容")
     private String content;
     @NotNull(message = "消息类型不能为空")

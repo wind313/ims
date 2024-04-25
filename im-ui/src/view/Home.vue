@@ -84,6 +84,12 @@
 			}
 		},
 		methods: {
+
+			// convert(text){
+			// 	return text.replace(/\n/g, '
+			// },
+
+
 			init(userInfo) {
 				this.$store.commit("setUserInfo", userInfo);
 				this.$store.commit("setUserState", this.$enums.USER_STATE.FREE);
@@ -102,7 +108,7 @@
 						}, 1000)
 
 					} else if (cmd == 3) {
-
+						msgInfo.content =  msgInfo.content.replace(/\n/g, '<br>')
 						// 插入私聊消息
 						this.handlePrivateMessage(msgInfo);
 					} else if (cmd == 4) {

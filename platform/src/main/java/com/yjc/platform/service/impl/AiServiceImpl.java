@@ -10,12 +10,9 @@ import com.yjc.platform.pojo.PrivateMessage;
 import com.yjc.platform.service.AiService;
 import com.yjc.platform.service.PrivateMessageService;
 import com.yjc.platform.session.SessionContext;
+import com.yjc.platform.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.client.AiClient;
-import org.springframework.ai.prompt.Prompt;
-import org.springframework.ai.prompt.messages.AssistantMessage;
-import org.springframework.ai.prompt.messages.Message;
-import org.springframework.ai.prompt.messages.UserMessage;
+import org.springframework.ai.ollama.OllamaChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class AiServiceImpl implements AiService {
 
     @Autowired
-    private AiClient aiClient;
+    private OllamaChatClient aiClient;
 
     @Autowired
     private PrivateMessageService privateMessageService;
@@ -47,11 +43,11 @@ public class AiServiceImpl implements AiService {
     public String sendAndResponse(Long AiId, String message){
         Long userId = SessionContext.getSession().getId();
         send(userId,AiId,message);
-        PrivateMessage response = response(userId,AiId, message);
+        PrivateMessageInfo response = response(userId,AiId, message);
         return response.getContent();
     }
     @Override
-    public PrivateMessage send(Long userId,Long AiId, String message){
+    public PrivateMessageInfo send(Long userId,Long AiId, String message){
 
         String key = RedisKey.IM_FRIEND+"::"+AiId+":"+userId;
         Integer count = (Integer) redisTemplate.opsForValue().get(key);
@@ -62,10 +58,10 @@ public class AiServiceImpl implements AiService {
             long seconds = LocalDateTime.now().until(tomorrow, ChronoUnit.SECONDS);
             redisTemplate.expire(key, seconds, TimeUnit.SECONDS);
         }
-        else if(count > 5){
+        else if(count >= 5){
             throw new GlobalException("发送消息已达上限");
         }
-        redisTemplate.opsForValue().increment(key,1);
+        else if(count >= 0) redisTemplate.opsForValue().increment(key,1);
 
         PrivateMessage privateMessage = new PrivateMessage();
         privateMessage.setSendTime(new Date());
@@ -75,31 +71,17 @@ public class AiServiceImpl implements AiService {
         privateMessage.setContent(message);
         privateMessage.setReceiveId(AiId);
         privateMessageService.save(privateMessage);
-        return privateMessage;
+        PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(privateMessage, PrivateMessageInfo.class);
+        return privateMessageInfo;
     }
 
     @Override
-    public PrivateMessage response(Long userId,Long AiId, String message) {
-        List<Message> messages = new ArrayList<>();
-
-        List<PrivateMessageInfo> history = history(userId,AiId,1L, 5L);
-        for(PrivateMessageInfo privateMessageInfo:history){
-            if(privateMessageInfo.getSendId().equals(userId) ){
-                UserMessage userMessage = new UserMessage(privateMessageInfo.getContent());
-                messages.add(userMessage);
-            }
-            else {
-                AssistantMessage assistantMessage = new AssistantMessage(privateMessageInfo.getContent());
-                messages.add(assistantMessage);
-            }
-        }
-        UserMessage userMessage = new UserMessage(message);
-        messages.add(userMessage);
+    public PrivateMessageInfo response(Long userId,Long AiId, String message) {
         String response = "";
         try{
-            response = aiClient.generate(new Prompt(messages)).getGeneration().getText();
+            response = aiClient.call(message);
         }catch (Exception e){
-            throw new GlobalException(ResultCode.PROGRAM_ERROR.getMessage());
+            throw new GlobalException(e.getMessage());
         }
         PrivateMessage resp = new PrivateMessage();
         resp.setSendTime(new Date());
@@ -109,7 +91,8 @@ public class AiServiceImpl implements AiService {
         resp.setContent(response);
         resp.setReceiveId(userId);
         privateMessageService.save(resp);
-        return resp;
+        PrivateMessageInfo privateMessageInfo = BeanUtil.copyProperties(resp, PrivateMessageInfo.class);
+        return privateMessageInfo;
     }
 
     @Override

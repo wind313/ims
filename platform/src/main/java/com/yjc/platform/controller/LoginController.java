@@ -20,7 +20,7 @@ public class LoginController {
     private UserService userService;
 
     @PostMapping("/login")
-    @Operation(summary = "登录",description = "返回accessToken和refreshToken")
+    @Operation(summary = "登录",description = "返回Authorization和refreshToken")
     public Result<LoginVO> login(@Valid @RequestBody LoginDto userDto){
         LoginVO userVO = userService.login(userDto);
         return ResultUtil.success(userVO);
@@ -34,7 +34,7 @@ public class LoginController {
     }
 
     @PutMapping("/refreshToken")
-    @Operation(summary = "刷新token",description = "使用refreshToken换取新的accessToken")
+    @Operation(summary = "刷新token",description = "使用refreshToken换取新的Authorization")
     public Result<LoginVO> refreshToken(@NotBlank(message = "refreshToken不能为空") @RequestHeader("refreshToken") String refreshToken){
         LoginVO loginVo =userService.refreshToken(refreshToken);
         return ResultUtil.success(loginVo);

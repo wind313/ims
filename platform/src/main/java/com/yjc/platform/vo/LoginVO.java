@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 @Schema(name = "用户登录VO")
 public class LoginVO {
-    @NotBlank(message = "accessToken不能为空")
-    @Schema(name = "accessToken")
-    private String accessToken;
-    @NotNull(message = "accessToken时间不能为空")
-    @Schema(name = "accessTokenExpiresIn",description = "accessToken过期时间（秒）")
-    private Integer accessTokenExpiresIn;
+    @NotBlank(message = "Authorization不能为空")
+    @Schema(name = "Authorization")
+    private String authorization;
+    @NotNull(message = "Authorization时间不能为空")
+    @Schema(name = "AuthorizationExpiresIn",description = "Authorization过期时间（秒）")
+    private Integer AuthorizationExpiresIn;
     @NotBlank(message = "refreshTokenToken不能为空")
     @Schema(name = "refreshToken")
     private String refreshToken;

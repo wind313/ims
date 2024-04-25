@@ -71,7 +71,7 @@
 								this.setCookie('username',this.loginForm.username);
 								this.setCookie('password',this.loginForm.password);
 								// 保存token
-								sessionStorage.setItem("accessToken",data.accessToken);
+								sessionStorage.setItem("Authorization",data.authorization);
 								sessionStorage.setItem("refreshToken",data.refreshToken);
 								this.$message.success("登陆成功");
 								this.$router.push("/home/chat");
