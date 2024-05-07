@@ -1,3 +1,5 @@
+import chatBox from "@/components/chat/ChatBox.vue";
+
 export default {
 
 	state: {
@@ -119,6 +121,8 @@ export default {
 					return;
 				}
 			}
+
+
 			// 新的消息
 			chat.messages.push(msgInfo);
 

@@ -28,10 +28,13 @@ spring:
       max-file-size: 10MB
       max-request-size: 20MB
   ai:
-    ollama:
-      base-url: http://localhost:11434
+    openai:
+      api-key: sk-rnBnuRiVYD0OG2cO7e9d4f85203947EdB6E5998eE1E208A5
+      base-url: https://api.xiaoai.plus/
       chat:
-        model: gemma:2b
+        options:
+          model: gpt-3.5-turbo
+          temperature: 0.5
 minio:
   endpoint: http://139.9.136.188:9001
   bucketName: yjc-im

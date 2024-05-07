@@ -15,6 +15,10 @@
 									 :msgInfo="msgInfo" @delete="deleteMessage" @recall="recallMessage">
 									</chat-message-item>
 								</li>
+								<li  v-if = "loading"
+										 v-loading="showLoading()"
+										 element-loading-text="AI回复中"
+										 element-loading-spinner="el-icon-loading"></li>
 							</ul>
 						</div>
 					</el-main>
@@ -95,7 +99,9 @@
 					y: 0
 				},
 				showHistory: false, // 是否显示历史聊天记录
-				lockMessage: false // 是否锁定发送
+				lockMessage: false, // 是否锁定发送
+				loading:true
+
 			}
 		},
 		methods: {
@@ -112,6 +118,14 @@
 					this.$store.commit("insertMessage", msgInfo);
 				})
 			},
+			showLoading(){
+				if (this.chat.targetId ===2 &&this.chat.messages.length > 0) {
+					const lastMessage = this.chat.messages[this.chat.messages.length - 1];
+					return lastMessage.sendId !== 2;
+				}
+				return false;
+			}
+			,
 			handleImageFail(res, file) {
 				let msgInfo = JSON.parse(JSON.stringify(file.raw.msgInfo));
 				msgInfo.loadStatus = 'fail';
@@ -361,6 +375,8 @@
 					let member = this.groupMembers.find((m) => m.memberId == msgInfo.sendId);
 					return member ? member.memberNickname : "";
 				} else {
+
+
 					return msgInfo.sendId == this.mine.id ? this.mine.nickname : this.chat.showName
 				}
 
@@ -370,7 +386,10 @@
 					let member = this.groupMembers.find((m) => m.memberId == msgInfo.sendId);
 					return member ? member.headImage : "";
 				} else {
-					return msgInfo.sendId == this.mine.id ? this.mine.headImageThumb : this.chat.headImage
+					if(msgInfo.sendId == this.mine.id ){
+						return  this.mine.headImageThumb
+					}
+					return this.chat.headImage
 				}
 			},
 			scrollToBottom() {
@@ -380,6 +399,8 @@
 				});
 			}
 		},
+
+
 		computed: {
 			mine() {
 				return this.$store.state.userStore.userInfo;

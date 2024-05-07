@@ -11,7 +11,7 @@
 		data() {
 			return {
 				loading: null,
-				uploadHeaders: {"accessToken":sessionStorage.getItem('accessToken')}
+				uploadHeaders: {"Authorization":sessionStorage.getItem('Authorization')}
 			}
 		},
 		props: {

@@ -4,7 +4,6 @@ import com.yjc.common.model.PrivateMessageInfo;
 import com.yjc.platform.constants.RedisKey;
 import com.yjc.platform.enums.MessageStatus;
 import com.yjc.platform.enums.MessageType;
-import com.yjc.platform.enums.ResultCode;
 import com.yjc.platform.exceptions.GlobalException;
 import com.yjc.platform.pojo.PrivateMessage;
 import com.yjc.platform.service.AiService;
@@ -12,7 +11,11 @@ import com.yjc.platform.service.PrivateMessageService;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.ollama.OllamaChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class AiServiceImpl implements AiService {
 
     @Autowired
-    private OllamaChatClient aiClient;
+    private OpenAiChatClient aiClient;
 
     @Autowired
     private PrivateMessageService privateMessageService;
@@ -77,9 +81,24 @@ public class AiServiceImpl implements AiService {
 
     @Override
     public PrivateMessageInfo response(Long userId,Long AiId, String message) {
+        List<Message> messages = new ArrayList<>();
+
+        List<PrivateMessageInfo> history = history(userId,AiId,1L, 5L);
+        for(PrivateMessageInfo privateMessageInfo:history){
+            if(privateMessageInfo.getSendId().equals(userId) ){
+                UserMessage userMessage = new UserMessage(privateMessageInfo.getContent());
+                messages.add(userMessage);
+            }
+            else {
+                AssistantMessage assistantMessage = new AssistantMessage(privateMessageInfo.getContent());
+                messages.add(assistantMessage);
+            }
+        }
+        UserMessage userMessage = new UserMessage(message);
+        messages.add(userMessage);
         String response = "";
         try{
-            response = aiClient.call(message);
+            response = aiClient.call(new Prompt(messages)).getResult().getOutput().getContent();
         }catch (Exception e){
             throw new GlobalException(e.getMessage());
         }

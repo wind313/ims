@@ -66,6 +66,7 @@
 	import ChatPrivateVideo from '../components/chat/ChatPrivateVideo.vue';
 	import ChatVideoAcceptor from '../components/chat/ChatVideoAcceptor.vue';
 	import * as assert from "assert";
+	import chatBox from "@/components/chat/ChatBox.vue";
 	
 	
 	export default {
@@ -99,6 +100,7 @@
 					this.pullUnreadMessage();
 				});
 				this.$wsApi.onmessage((cmd,msgInfo) => {
+					console.log(msgInfo);
 
 					if (cmd == 2) {
 						// 异地登录，强制下线
