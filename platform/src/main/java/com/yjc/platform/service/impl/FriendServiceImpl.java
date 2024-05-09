@@ -26,134 +26,166 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @CacheConfig(cacheNames = RedisKey.IM_FRIEND)
-public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implements FriendService {
+public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> implements FriendService {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public void add(Long friendId) {
         long userId = SessionContext.getSession().getId();
-        if(userId == friendId){
+        if (userId == friendId) {
             throw new GlobalException("不能关注自己");
         }
-        bind(userId,friendId);
+        bind(userId, friendId);
     }
 
     @Override
     public boolean isConcern(Long userId1, Long userId2) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .eq(Friend::getUserId,userId1)
-                .eq(Friend::getFriendId,userId2);
-        return count(queryWrapper)>0;
+                .eq(Friend::getUserId, userId1)
+                .eq(Friend::getFriendId, userId2);
+        return count(queryWrapper) > 0;
     }
 
     @Override
     public boolean isFans(Long userId1, Long userId2) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .eq(Friend::getUserId,userId2)
-                .eq(Friend::getFriendId,userId1);
-        return count(queryWrapper)>0;
+                .eq(Friend::getUserId, userId2)
+                .eq(Friend::getFriendId, userId1);
+        return count(queryWrapper) > 0;
     }
 
     @Override
     @Cacheable(key = "#p0+':'+#p1")
     public boolean isFriend(Long userId1, Long userId2) {
 
-        return isConcern(userId1,userId2) && isFans(userId1,userId2);
+        return isConcern(userId1, userId2) && isFans(userId1, userId2);
     }
 
     public void bind(Long userId, Long friendId) {
-        if(!isConcern(userId,friendId)){
+        if (!isConcern(userId, friendId)) {
             Friend friend = new Friend();
             friend.setUserId(userId);
             friend.setFriendId(friendId);
             save(friend);
-            redisTemplate.delete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
-            redisTemplate.delete(RedisKey.IM_FRIEND+"::"+friendId+":"+userId);
-        }
-        else{
+            redisTemplate.delete(RedisKey.IM_FRIEND + "::" + userId + ":" + friendId);
+            redisTemplate.delete(RedisKey.IM_FRIEND + "::" + friendId + ":" + userId);
+        } else {
             throw new GlobalException("你已关注对方");
         }
     }
+
     public List<FriendVO> getList(int type) {
         Long userId = SessionContext.getSession().getId();
-
+        List<Friend> friends = findConcernsByUserId(userId);
+        ;
         List<Friend> list = null;
-        if(type == 0){
+        if (type == 0) {
             list = findConcernsByUserId(userId);
-        }
-        else if(type == 1){
+        } else if (type == 1) {
             list = findFansByUserId(userId);
-        }
-        else if(type == 2){
-            list = findFriendByUserId(userId);
+        } else if (type == 2) {
+            list = friends;
         }
 
-        if(list == null || list.size() == 0){
+        if (list == null || list.size() == 0) {
             return Collections.EMPTY_LIST;
         }
-        List<Long> ids = list.stream().map(friend -> friend.getFriendId()).collect(Collectors.toList());
+        List<Long> ids = null;
+        if(type == 0 || type == 2){
+            ids = list.stream().map(friend -> friend.getFriendId()).collect(Collectors.toList());
+        }
+        else if(type == 1){
+            ids = list.stream().map(friend -> friend.getUserId()).collect(Collectors.toList());
+        }
 
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.lambda().in(User::getId,ids);
+        wrapper.lambda().in(User::getId, ids);
         List<User> users = userService.list(wrapper);
 
-
         List<FriendVO> l = list.stream().map(friend -> {
-            FriendVO friendVO = BeanUtil.copyProperties(friend, FriendVO.class);
-            User user1 = users.stream().filter(user -> user.getId() == friend.getFriendId()).findFirst().get();
-
+            FriendVO friendVO = new FriendVO();
+            User user1 = null;
+            if (type == 0){
+                user1 = users.stream().filter(user -> user.getId() == friend.getFriendId()).findFirst().get();
+            }
+            else if (type == 1){
+                user1 = users.stream().filter(user -> user.getId() == friend.getUserId()).findFirst().get();
+            }
+            else if (type == 2) {
+                user1 = users.stream().filter(user -> user.getId() == friend.getFriendId()).findFirst().get();
+            }
+            friendVO.setFriendId(user1.getId());
             friendVO.setNickname(user1.getNickname());
             friendVO.setHeadImage(user1.getHeadImageThumb());
             friendVO.setSignature(user1.getSignature());
+
+            if (type == 0) {
+                friendVO.setIsConcern(true);
+                if (friends.stream().filter(f -> f.getFriendId() == friend.getUserId()).count() == 0)
+                    friendVO.setIsFans(false);
+                else friendVO.setIsFans(true);
+            } else if (type == 1) {
+                friendVO.setIsFans(true);
+                if (friends.stream().filter(f -> f.getFriendId() == friend.getFriendId()).count() == 0)
+                    friendVO.setIsConcern(false);
+                else friendVO.setIsConcern(true);
+            } else if (type == 2) {
+                friendVO.setIsConcern(true);
+                friendVO.setIsFans(true);
+            }
+
+
             return friendVO;
         }).collect(Collectors.toList());
+
         return l;
     }
 
     @Override
     public void delete(Long friendId) {
         Long userId = SessionContext.getSession().getId();
-        unbind(userId,friendId);
+        unbind(userId, friendId);
     }
-    public void unbind(Long userId,Long friendId){
-        log.info(userId.toString(),friendId);
+
+    public void unbind(Long userId, Long friendId) {
+        log.info(userId.toString(), friendId);
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
-                .eq(Friend::getUserId,userId)
-                .eq(Friend::getFriendId,friendId);
+                .eq(Friend::getUserId, userId)
+                .eq(Friend::getFriendId, friendId);
         Friend one = getOne(queryWrapper);
-        if(one == null ){
+        if (one == null) {
             throw new GlobalException("对方不是你的好友");
         }
         removeById(one.getId());
-        redisTemplate.delete(RedisKey.IM_FRIEND+"::"+userId+":"+friendId);
-        redisTemplate.delete(RedisKey.IM_FRIEND+"::"+friendId+":"+userId);
+        redisTemplate.delete(RedisKey.IM_FRIEND + "::" + userId + ":" + friendId);
+        redisTemplate.delete(RedisKey.IM_FRIEND + "::" + friendId + ":" + userId);
     }
 
     @Override
-    public List<Friend> findConcernsByUserId(Long id){
+    public List<Friend> findConcernsByUserId(Long id) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Friend::getUserId,id);
+        queryWrapper.lambda().eq(Friend::getUserId, id);
 
         return list(queryWrapper);
     }
 
     @Override
-    public List<Friend> findFansByUserId(Long id){
+    public List<Friend> findFansByUserId(Long id) {
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Friend::getFriendId,id);
+        queryWrapper.lambda().eq(Friend::getFriendId, id);
         return list(queryWrapper);
     }
 
     @Override
-    public List<Friend> findFriendByUserId(Long id){
+    public List<Friend> findFriendByUserId(Long id) {
         List<Friend> concerns = findConcernsByUserId(id);
         List<Friend> fans = findFansByUserId(id);
         List<Friend> result = concerns.stream()
@@ -169,10 +201,10 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
     public FriendVO findByFriendId(Long friendId) {
         Long userId = SessionContext.getSession().getId();
         QueryWrapper<Friend> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Friend::getFriendId,friendId)
-                .eq(Friend::getUserId,userId);
+        queryWrapper.lambda().eq(Friend::getFriendId, friendId)
+                .eq(Friend::getUserId, userId);
         Friend friend = getOne(queryWrapper);
-        if(friend == null){
+        if (friend == null) {
             throw new GlobalException("对方不是你的好友");
         }
         User user = userService.findById(friendId);
@@ -185,7 +217,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper,Friend> implemen
     }
 
     @Override
-    public List<FriendVO> concerns(){
+    public List<FriendVO> concerns() {
         return getList(0);
     }
 

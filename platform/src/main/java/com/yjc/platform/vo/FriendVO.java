@@ -18,4 +18,8 @@ public class   FriendVO {
     private String headImage;
     @Schema(name = "signature",description = "好友个性签名")
     private String signature;
+    @Schema(name = "isConcern",description = "是否是关注")
+    private Boolean isConcern;
+    @Schema(name = "isFans",description = "是否是粉丝")
+    private Boolean isFans;
 }
