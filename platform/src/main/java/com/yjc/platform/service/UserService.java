@@ -20,8 +20,10 @@ public interface UserService extends IService<User> {
 
     boolean isOnline(long userId);
 
-    User findById(Long id);
+    UserVO findById(Long id);
     User findByUsername(String username);
+
+    UserVO findUserVOByUsername(String username);
 
     void update(UserVO userVO);
 

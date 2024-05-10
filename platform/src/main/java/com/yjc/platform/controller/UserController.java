@@ -37,23 +37,18 @@ public class UserController {
     @Operation(summary = "查询自己信息",description = "获取自己的信息")
     public Result<UserVO> getSelf(){
         Session session = SessionContext.getSession();
-        User user = userService.findById(session.getId());
-        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
-        return ResultUtil.success(userVO);
+        return ResultUtil.success(userService.findById(session.getId()));
     }
     @GetMapping("/find/{id}")
     @Operation(summary = "查找用户",description = "根据id查找用户")
     public Result<UserVO> findById(@NotNull(message = "用户id不能为空") @PathVariable("id") Long id){
-        User user = userService.findById(id);
-        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
-        return ResultUtil.success(userVO);
+        return ResultUtil.success(userService.findById(id));
     }
     @GetMapping("/find")
     @Operation(summary = "查找用户",description = "根据用户名查找用户")
     public Result<UserVO> findByUsername(@NotBlank(message = "用户名不能为空") @RequestParam("username") String username){
-        User user = userService.findByUsername(username);
-        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
-        userVO.setOnline(userService.isOnline(user.getId()));
+        UserVO userVO = userService.findUserVOByUsername(username);
+        userVO.setOnline(userService.isOnline(userVO.getId()));
         return ResultUtil.success(userVO);
     }
     @PutMapping("/update")

@@ -12,6 +12,7 @@ import com.yjc.platform.enums.ResultCode;
 import com.yjc.platform.mapper.UserMapper;
 import com.yjc.platform.pojo.GroupMember;
 import com.yjc.platform.pojo.User;
+import com.yjc.platform.service.FriendService;
 import com.yjc.platform.service.GroupMemberService;
 import com.yjc.platform.service.UserService;
 import com.yjc.platform.session.Session;
@@ -42,6 +43,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
+
+    @Autowired
+    private FriendService friendService;
 
     @Override
     public LoginVO login(LoginDto userDto) {
@@ -109,6 +113,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
     }
 
     public User findByUsername(String username){
+
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername,username);
         User one = getOne(queryWrapper);
@@ -116,6 +121,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
             throw new GlobalException("该用户不存在");
         }
         return one;
+    }
+
+    @Override
+    public UserVO findUserVOByUsername(String username){
+
+        User one = findByUsername(username);
+        UserVO userVO = null;
+        if(one != null){
+            Long userId = SessionContext.getSession().getId();
+            userVO = BeanUtil.copyProperties(one,UserVO.class);
+            userVO.setIsConcern(friendService.isConcern(userId,one.getId()));
+            userVO.setIsFans(friendService.isFans(userId,one.getId()));
+        }
+        return userVO;
     }
 
     @Transactional
@@ -167,14 +186,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         return serverId!=null;
     }
     @Override
-    public User findById(Long id){
+    public UserVO findById(Long id){
+        Long userId = SessionContext.getSession().getId();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getId,id);
         User one = getOne(queryWrapper);
+        UserVO userVO = null;
         if(one == null){
             throw new GlobalException("该用户不存在");
         }
-        return one;
+        else {
+            userVO = BeanUtil.copyProperties(one,UserVO.class);
+            userVO.setIsConcern(friendService.isConcern(userId,id));
+            userVO.setIsFans(friendService.isFans(userId,id));
+        }
+        return userVO;
     }
 
 }

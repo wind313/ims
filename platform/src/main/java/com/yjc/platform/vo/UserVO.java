@@ -34,6 +34,10 @@ public class UserVO {
     private String headImageThumb;
     @Schema(name = "online",description = "是否在线")
     private Boolean online;
+    @Schema(name = "isConcern",description = "是否是关注")
+    private Boolean isConcern;
+    @Schema(name = "isFans",description = "是否是粉丝")
+    private Boolean isFans;
 
 
 }

@@ -12,6 +12,7 @@ import com.yjc.platform.service.UserService;
 import com.yjc.platform.session.SessionContext;
 import com.yjc.platform.util.BeanUtil;
 import com.yjc.platform.vo.FriendVO;
+import com.yjc.platform.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -83,7 +84,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
 
     public List<FriendVO> getList(int type) {
         Long userId = SessionContext.getSession().getId();
-        List<Friend> friends = findConcernsByUserId(userId);
+        List<Friend> friends = findFriendByUserId(userId);
         ;
         List<Friend> list = null;
         if (type == 0) {
@@ -125,17 +126,16 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
             friendVO.setNickname(user1.getNickname());
             friendVO.setHeadImage(user1.getHeadImageThumb());
             friendVO.setSignature(user1.getSignature());
-
             if (type == 0) {
                 friendVO.setIsConcern(true);
-                if (friends.stream().filter(f -> f.getFriendId() == friend.getUserId()).count() == 0)
-                    friendVO.setIsFans(false);
-                else friendVO.setIsFans(true);
+                if (friends.stream().filter(f -> f.getFriendId() == friend.getFriendId()).count()>0L)
+                    friendVO.setIsFans(true);
+                else friendVO.setIsFans(false);
             } else if (type == 1) {
                 friendVO.setIsFans(true);
-                if (friends.stream().filter(f -> f.getFriendId() == friend.getFriendId()).count() == 0)
-                    friendVO.setIsConcern(false);
-                else friendVO.setIsConcern(true);
+                if (friends.stream().filter(f -> f.getFriendId() == friend.getUserId()).count()>0L)
+                    friendVO.setIsConcern(true);
+                else friendVO.setIsConcern(false);
             } else if (type == 2) {
                 friendVO.setIsConcern(true);
                 friendVO.setIsFans(true);
@@ -207,12 +207,14 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
         if (friend == null) {
             throw new GlobalException("对方不是你的好友");
         }
-        User user = userService.findById(friendId);
+        UserVO user = userService.findById(friendId);
         FriendVO friendVO = new FriendVO();
         friendVO.setFriendId(friendId);
         friendVO.setNickname(user.getNickname());
         friendVO.setHeadImage(user.getHeadImageThumb());
         friendVO.setSignature(user.getSignature());
+        friendVO.setIsFans(user.getIsFans());
+        friendVO.setIsConcern(user.getIsConcern());
         return friendVO;
     }
 
