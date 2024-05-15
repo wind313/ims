@@ -28,4 +28,6 @@ public interface UserService extends IService<User> {
     void update(UserVO userVO);
 
     List<Long> checkOnline(String userIds);
+
+    boolean isCompleteInfo();
 }

@@ -203,4 +203,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         return userVO;
     }
 
+    @Override
+    public boolean isCompleteInfo(){
+        User user = getById(SessionContext.getSession().getId());
+        if(user.getAge() == 0 || user.getHeadImageThumb().isEmpty() ||user.getSignature().isEmpty()){
+            return false;
+        }
+
+        return true;
+    }
+
+
 }

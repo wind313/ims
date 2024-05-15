@@ -26,4 +26,6 @@ public interface GroupService extends IService<Group> {
     List<GroupVO> getList();
 
     void invite(InviteVO inviteVO);
+
+    void chatroom();
 }

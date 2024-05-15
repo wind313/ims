@@ -258,4 +258,20 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         }).collect(Collectors.toList());
         groupMemberService.saveOrUpdateBatch(group.getId(),collect);
     }
+
+    @Override
+    public void chatroom() {
+        if(!userService.isCompleteInfo()){
+            throw new GlobalException("请完善个人信息！");
+        }
+        Long userId = SessionContext.getSession().getId();
+        User user = userService.getById(userId);
+        GroupMember member = new GroupMember();
+        member.setGroupId(16L);
+        member.setMemberId(userId);
+        member.setMemberNickname(user.getNickname());
+        member.setHeadImage(user.getHeadImageThumb());
+        member.setQuit(false);
+        groupMemberService.saveOrUpdate(member);
+    }
 }

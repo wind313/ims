@@ -82,6 +82,12 @@ public class GroupController {
         groupService.invite(inviteVO);
         return ResultUtil.success();
     }
+    @PostMapping("/chatroom")
+    @Operation(summary = "加入万人聊天室",description = "加入万人聊天室")
+    public Result<GroupVO> chatroom(){
+        groupService.chatroom();
+        return ResultUtil.success();
+    }
 
 
 
